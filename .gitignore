@@ -1,0 +1,14 @@
+# Dependências e artefatos gerados
+node_modules/
+dist/
+coverage/
+.npm-cache/
+
+# Configurações locais
+.env
+*.local
+
+# Ferramentas e sistema operacional
+.DS_Store
+Thumbs.db
+
