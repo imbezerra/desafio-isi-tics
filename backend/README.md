@@ -1,6 +1,6 @@
 # Backend da liga
 
-API NestJS, Node.js 22, TypeScript e PostgreSQL 16. Regras e contrato: [enunciado](../docs/README.md). Os seis endpoints de jogadores estão implementados sob `/api/v1/players`, o cadastro/consulta de clubes sob `/api/v1/clubs` e a compra em `POST /api/v1/players/{id}/buy`.
+API NestJS, Node.js 22, TypeScript e PostgreSQL 16. Regras e contrato: [enunciado](../docs/README.md). Os seis endpoints de jogadores estão implementados sob `/api/v1/players`, o cadastro/consulta de clubes sob `/api/v1/clubs`, a compra em `POST /api/v1/players/{id}/buy` e a venda em `POST /api/v1/players/{id}/sell`.
 
 ## Execução com Docker
 
@@ -64,7 +64,7 @@ TEST_DATABASE_URL='postgresql://liga_user:liga_password@localhost:5432/liga_fute
 
 Na configuração local com porta `5434`, substitua `5432` nas URLs acima por `5434`. O ambiente de teste utiliza porta HTTP temporária, sem disputar a porta da API Docker.
 
-São verificados cadastro, cabeçalho Location, formatos inválidos, filtros, paginação, ordenação, edição, exclusão lógica e atomicidade da alteração de condição dos jogadores. Para clubes, são verificados caixa inicial, normalização, unicidade de nome e sigla, ordenação, consulta e `404`. Para compra, são verificados os contratos, a transação, os limites de caixa e elenco, as recusas e o rollback da operação.
+São verificados cadastro, cabeçalho Location, formatos inválidos, filtros, paginação, ordenação, edição, exclusão lógica e atomicidade da alteração de condição dos jogadores. Para clubes, são verificados caixa inicial, normalização, unicidade de nome e sigla, ordenação, consulta e `404`. Para compra, são verificados os contratos, a transação, os limites de caixa e elenco, as recusas e o rollback da operação. Para venda, os testes cobrem multa, lucro, comissão, contrato, liberação do jogador, remoção da escalação, recompra, corpo ignorado e rollback de todos os efeitos.
 
 ## Variáveis
 
@@ -103,7 +103,9 @@ Dentro de `src/jogadores/`, `src/clubes/` e `src/mercado/`, cada pasta tem uma r
 - `swagger/`: documentação dos parâmetros da API.
 - `jogadores.module.ts`: registra controller, service e repository para injeção de dependências.
 
-Em `src/mercado/`, `CompraInputPipe` valida `club_id` e o formato de `loyalty_until`; `compra.rules.ts` aplica o prazo, a taxa e os limites de caixa e elenco. `MercadoService` coordena a compra, enquanto `MercadoRepository` concentra as consultas e faz caixa, vínculo do jogador, contrato e transação participarem da mesma transação serializável. `compra.presenter.ts` monta a resposta `200` com os valores do momento. `fidelidade.rules.ts` calcula dias restantes e percentual de multa para a consulta do clube e para a futura venda.
+Em `src/mercado/`, `CompraInputPipe` valida `club_id` e o formato de `loyalty_until`; `compra.rules.ts` aplica o prazo, a taxa e os limites de caixa e elenco. `venda.rules.ts` calcula multa, lucro, comissão progressiva, crédito e situação final do contrato. `MercadoService` coordena compra e venda, enquanto `MercadoRepository` concentra as consultas e faz caixa, vínculo do jogador, contrato, transação e saída da escalação participarem da mesma transação serializável. Os presenters montam as respostas `200` usando um mapeamento compartilhado de transação. `fidelidade.rules.ts` calcula dias restantes e percentual de multa para a consulta do clube e para a venda.
+
+A venda ignora o corpo, inclusive JSON malformado, conforme V1. Um jogador no elenco sem contrato ativo indica inconsistência dos dados: a venda retorna 500 sem gravar efeitos. Contratos ativos permanecem com esse status até a venda, mesmo após o prazo de fidelidade; nesse caso a venda os encerra sem multa.
 
 `src/common/` mantém tipos, cálculos e parsers reutilizados. `src/database/` gerencia a conexão Prisma. O endpoint de saúde delega a consulta técnica ao `HealthService`.
 

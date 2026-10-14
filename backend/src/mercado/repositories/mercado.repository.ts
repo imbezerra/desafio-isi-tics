@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../database/prisma.service';
+import { CalculoVenda } from '../domain/venda.rules';
 
 @Injectable()
 export class MercadoRepository {
@@ -46,6 +47,58 @@ export class MercadoRepository {
 
   colocarNoElenco(jogadorId: number, clubeId: number) {
     return this.banco.jogador.update({ where: { id: jogadorId }, data: { clubeId } });
+  }
+
+  buscarContratoAtivo(jogadorId: number, clubeId: number) {
+    return this.banco.contrato.findFirst({
+      where: { jogadorId, clubeId, situacao: 'ATIVO' },
+      orderBy: { id: 'desc' },
+    });
+  }
+
+  creditarCaixa(clubeId: number, credito: string) {
+    return this.banco.clube.update({
+      where: { id: clubeId },
+      data: { caixa: { increment: credito } },
+    });
+  }
+
+  liberarJogador(jogadorId: number) {
+    return this.banco.jogador.update({ where: { id: jogadorId }, data: { clubeId: null } });
+  }
+
+  removerDaEscalacao(jogadorId: number) {
+    return this.banco.escalacao.deleteMany({ where: { jogadorId } });
+  }
+
+  encerrarContrato(id: number, situacao: string, momento: Date) {
+    return this.banco.contrato.update({
+      where: { id },
+      data: { situacao, encerradoEm: momento },
+    });
+  }
+
+  criarTransacaoVenda(
+    jogadorId: number,
+    clubeId: number,
+    nomeJogador: string,
+    venda: CalculoVenda,
+    momento: Date,
+  ) {
+    return this.banco.transacao.create({
+      data: {
+        jogadorId,
+        clubeId,
+        nomeJogador,
+        tipo: 'VENDA',
+        valor: venda.valor.toString(),
+        taxa: venda.comissao.toString(),
+        multa: venda.multa.toString(),
+        lucro: venda.lucro.toString(),
+        variacaoCaixa: venda.credito.toString(),
+        criadoEm: momento,
+      },
+    });
   }
 
   criarContrato(jogadorId: number, clubeId: number, valor: string, fim: Date, momento: Date) {

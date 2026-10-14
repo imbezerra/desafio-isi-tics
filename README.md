@@ -52,7 +52,7 @@ Para executar a API fora do Docker e rodar verificações, consulte [backend/REA
 - `backend/src/database/`: conexão Prisma.
 - `backend/src/jogadores/`: módulo separado em controllers, DTOs, pipes, services, repositories, domínio, presenters e Swagger.
 - `backend/src/clubes/`: módulo de cadastro e consulta de clubes, com a mesma separação em camadas.
-- `backend/src/mercado/`: compra de jogadores, contratos, taxas e transações numa operação atômica.
+- `backend/src/mercado/`: compra e venda de jogadores, contratos, taxas, multas, comissões e transações atômicas.
 - `backend/test/unit/`: testes unitários organizados por área, espelhando os diretórios de `src/`.
 - `backend/test/integration/`: testes de integração HTTP organizados por módulo, com PostgreSQL exclusivo.
 - `backend/prisma/`: modelo de dados e migrations versionadas das sete tabelas obrigatórias.
@@ -68,13 +68,13 @@ As bibliotecas e os motivos de uso estão descritos no README do backend.
 - Arquitetura em camadas com Repository: controllers delegam ao serviço, serviços coordenam regras e transações, e repositories concentram o Prisma. Funções de domínio validam regras; pipes validam os formatos sem converter textos em números nos corpos JSON. A explicação de cada camada está no README do backend.
 - A exclusão de jogador é lógica. Registros históricos não são apagados.
 - Na listagem, o PostgreSQL aplica filtros persistidos. Busca Unicode, filtro de mercado e ordenação são feitos na API antes de paginar, reutilizando o cálculo central de mercado. Essa escolha evita duplicar a fórmula em SQL, mas consome memória proporcional aos jogadores candidatos. Para volumes elevados, essa etapa precisará migrar para consultas especializadas no banco.
-- Edição, condição, exclusão e compra usam transações com isolamento serializável. Não há repetição automática em conflito concorrente; na compra esse conflito retorna 409, e falhas inesperadas retornam 500 e desfazem a operação.
+- Edição, condição, exclusão, compra e venda usam transações com isolamento serializável. Não há repetição automática em conflito concorrente; na compra e venda esse conflito retorna 409, e falhas inesperadas retornam 500 e desfazem a operação.
 - Os nomes são normalizados usando somente espaços U+0020; a comparação alfabética segue pontos de código Unicode, sem collation dependente do sistema.
 
 ## Funcionalidades não implementadas
 
-Venda; consulta do histórico de transações e exportação CSV; gerenciamento de escalações; partidas e classificação; interface React; logs HTTP por requisição. A compra já grava contratos e transações; o histórico e o encerramento dos contratos entram na próxima etapa. A mudança para `DOENTE` já remove o titular de uma escalação existente atomicamente, preparando a integração com o módulo da liga.
+Consulta do histórico de transações e exportação CSV; gerenciamento de escalações; partidas e classificação; interface React; logs HTTP por requisição. Compra e venda já gravam as transações e controlam os contratos. A venda e a mudança para `DOENTE` removem o titular de uma escalação existente atomicamente, preparando a integração com o módulo da liga.
 
 ## Uso de inteligência artificial
 
-Foi utilizado Codex para analisar `docs/`, propor a stack, implementar a estrutura NestJS/Docker/Prisma, os arquivos de `backend/src/common/`, os módulos `backend/src/jogadores/`, `backend/src/clubes/` e `backend/src/mercado/`, testes e documentação. A ferramenta foi usada para traduzir os requisitos em código e conferir comportamento com testes locais e PostgreSQL real. Foram aceitas a estrutura modular e as funções reutilizáveis; a sugestão alternativa de FastAPI foi descartada em favor de NestJS. O desenvolvimento é explicado ao responsável pelo projeto, que aprova cada commit. A declaração será atualizada conforme novas funcionalidades forem implementadas.
+Será preenchido posteriormente

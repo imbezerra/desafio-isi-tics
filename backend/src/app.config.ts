@@ -6,7 +6,9 @@ import { HttpExceptionFilter } from './common/errors/http-exception.filter';
 export function configurarApi(app: INestApplication): void {
   const lerJson = json();
   app.use((pedido: Request, resposta: Response, proximo: NextFunction) => {
-    if (['POST', 'PUT', 'PATCH'].includes(pedido.method)) {
+    const vendaSemCorpo =
+      pedido.method === 'POST' && /^\/api\/v1\/players\/[^/]+\/sell\/?$/.test(pedido.path);
+    if (['POST', 'PUT', 'PATCH'].includes(pedido.method) && !vendaSemCorpo) {
       lerJson(pedido, resposta, proximo);
     } else {
       proximo();

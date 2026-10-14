@@ -11,6 +11,13 @@ import { MercadoService } from '../services/mercado.service';
 export class MercadoController {
   constructor(private readonly mercado: MercadoService) {}
 
+  @Post(':id/sell')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Vende um jogador do elenco e encerra seu contrato' })
+  vender(@Param('id', IdPipe) id: number) {
+    return this.mercado.vender(id);
+  }
+
   @Post(':id/buy')
   @HttpCode(200)
   @ApiOperation({ summary: 'Compra um jogador livre para um clube' })
