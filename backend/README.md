@@ -6,6 +6,8 @@ O histórico está disponível em `GET /api/v1/clubs/{id}/transactions` e a expo
 
 A escalação é consultada em `GET /api/v1/clubs/{id}/lineup` e substituída em `PUT /api/v1/clubs/{id}/lineup`, com corpo como `{ "formation": "2-1-1", "player_ids": [1, 2, 3, 4, 5] }`. As formações aceitas são `3-1`, `2-2`, `2-1-1` e `1-2-1`. Os cinco ids devem ser distintos e incluir um goleiro, com os jogadores de linha distribuídos pelos setores da formação. Todos devem pertencer ao clube e estar APTO ou MAL_CONDICIONADO. A resposta traz `club_id`, `formation`, `complete` e `players` na ordem do elenco, sem alterar o caixa. Sem escalação, `formation` é nulo e `players` é vazio; ao perder um titular por doença ou venda, a formação é preservada e `complete` passa a falso.
 
+Para jogar, envie `POST /api/v1/matches` com `{ "home_club_id": 1, "away_club_id": 2 }`. Os clubes devem ser distintos e ter escalações completas. A resposta `201` inclui `Location`, o placar e os seis duelos registrados. `GET /api/v1/matches` lista partidas sem duelos, com filtro opcional `club_id`; `GET /api/v1/matches/{id}` traz todos os duelos. `GET /api/v1/standings` calcula a classificação de todos os clubes, inclusive os sem jogos, por pontos, saldo, gols marcados e nome.
+
 ## Execução com Docker
 
 Siga a [execução na raiz](../README.md). A API em `http://localhost:3000` aplica migrations antes de iniciar, sem inserir dados de exemplo.
@@ -74,6 +76,8 @@ Histórico e CSV são verificados com o ciclo real de compra e venda: filtros co
 
 Os testes de escalação verificam as quatro formações, consulta vazia, ordenação, substituição, validações, preservação da escalação nas recusas e rollback em falha de gravação. Os elencos são formados por compras reais via API. Venda e alteração para DOENTE são testadas com escalação criada pelo endpoint, incluindo a ausência de retorno automático depois da recuperação.
 
+Partidas e classificação usam o exemplo da RN20 (Águias FC 1 × 2 Delta FC) como referência, compartilhado em `test/fixtures/liga.fixture.ts`. Os testes verificam os seis duelos, redução de condição e arredondamento, empate sem gol, preservação de dados após edição/venda/exclusão, formações históricas, filtros, ordem, efeitos sobre a classificação, ausência de efeitos em caixa/elenco e rollback caso um duelo falhe. Os testes unitários de classificação reproduzem também o exemplo de seis clubes e quatro partidas da RN21.
+
 ## Variáveis
 
 - `DATABASE_URL`: conexão PostgreSQL, usada pelo Prisma.
@@ -118,6 +122,8 @@ A venda ignora o corpo, inclusive JSON malformado, conforme V1. Um jogador no el
 O histórico tem `HistoricoController`, `HistoricoService` e `HistoricoRepository` próprios dentro do módulo de mercado. JSON e CSV compartilham validação, consulta e apresentação das transações. O repository filtra e ordena no PostgreSQL, sem consultar os dados atuais do jogador para montar os registros históricos. `historico-resumo.ts` soma os valores com Decimal, e `historico-csv.presenter.ts` cuida do formato e do escape. Jogadores excluídos permanecem no histórico sem filtro; usá-los em `player_id` retorna 404. Sem registros, o JSON tem lista vazia e totais zerados, e o CSV contém somente cabeçalho e LF. O Content-Type CSV é definido após o sucesso da consulta, mantendo erros em JSON.
 
 Em `src/liga/`, `EscalacaoInputPipe` valida formação e ids; `escalacao.rules.ts` confere clube, condição e distribuição dos setores definidos em `formacoes.ts`. `EscalacoesService` coordena a substituição, e `EscalacoesRepository` grava formação e cinco titulares numa transação serializável. O presenter reutiliza a apresentação de jogadores e a ordenação compartilhada em `common/orderings/elenco.ordering.ts`, também usada pela consulta de clube. Conflitos concorrentes retornam 409, sem repetição automática.
+
+Ainda em `src/liga/`, `partida.rules.ts` seleciona os confrontos, aplica o efeito da condição e calcula gols; `classificacao.rules.ts` acumula placares e aplica desempates. Os controllers e pipes validam os dados e delegam aos serviços. `PartidasRepository` lê os titulares e grava partida e seis duelos na mesma transação serializável, preservando os dados usados. A consulta apresenta os registros gravados e deriva `result` do placar. `ClassificacaoService` lê clubes e placares numa transação consistente e calcula a tabela sem gravar pontos ou posições. No empate de nomes normalizados, o id crescente garante uma ordem estável, conforme as premissas.
 
 `src/common/` mantém tipos, cálculos e parsers reutilizados. `src/database/` gerencia a conexão Prisma. O endpoint de saúde delega a consulta técnica ao `HealthService`.
 
