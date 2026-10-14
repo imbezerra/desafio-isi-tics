@@ -53,6 +53,7 @@ Para executar a API fora do Docker e rodar verificações, consulte [backend/REA
 - `backend/src/jogadores/`: módulo separado em controllers, DTOs, pipes, services, repositories, domínio, presenters e Swagger.
 - `backend/src/clubes/`: módulo de cadastro e consulta de clubes, com a mesma separação em camadas.
 - `backend/src/mercado/`: compra e venda de jogadores, contratos, taxas, multas, comissões, transações atômicas, histórico filtrado com totais e exportação CSV.
+- `backend/src/liga/`: consulta e substituição da escalação, com validação de formação e titulares.
 - `backend/test/unit/`: testes unitários organizados por área, espelhando os diretórios de `src/`.
 - `backend/test/integration/`: testes de integração HTTP organizados por módulo, com PostgreSQL exclusivo.
 - `backend/prisma/`: modelo de dados e migrations versionadas das sete tabelas obrigatórias.
@@ -73,7 +74,7 @@ As bibliotecas e os motivos de uso estão descritos no README do backend.
 
 ## Funcionalidades não implementadas
 
-Gerenciamento de escalações; partidas e classificação; interface React; logs HTTP por requisição. Compra, venda, contratos, histórico de transações com totais e exportação CSV estão implementados. A venda e a mudança para `DOENTE` removem o titular de uma escalação existente atomicamente, preparando a integração com o módulo da liga.
+Partidas e classificação; interface React; logs HTTP por requisição. Jogadores, clubes, compra, venda, contratos, histórico de transações, CSV e escalações estão implementados. A venda e a mudança para `DOENTE` removem titulares da escalação atomicamente, preservando a formação; recuperar a condição não reinsere o jogador automaticamente.
 
 ## Uso de inteligência artificial
 

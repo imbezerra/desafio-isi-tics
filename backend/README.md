@@ -4,6 +4,8 @@ API NestJS, Node.js 22, TypeScript e PostgreSQL 16. Regras e contrato: [enunciad
 
 O histórico está disponível em `GET /api/v1/clubs/{id}/transactions` e a exportação CSV em `GET /api/v1/clubs/{id}/transactions/export`. Ambos aceitam `type` (`COMPRA`, `VENDA` ou os dois separados por vírgula, sem espaços e sem repetição) e `player_id`. Exemplo: `/api/v1/clubs/1/transactions?type=VENDA&player_id=2`. O JSON inclui `data` e `summary`, com os totais dos mesmos registros filtrados. O CSV preserva essa ordem e usa UTF-8 sem BOM, separador `;`, vírgula decimal e LF inclusive na última linha.
 
+A escalação é consultada em `GET /api/v1/clubs/{id}/lineup` e substituída em `PUT /api/v1/clubs/{id}/lineup`, com corpo como `{ "formation": "2-1-1", "player_ids": [1, 2, 3, 4, 5] }`. As formações aceitas são `3-1`, `2-2`, `2-1-1` e `1-2-1`. Os cinco ids devem ser distintos e incluir um goleiro, com os jogadores de linha distribuídos pelos setores da formação. Todos devem pertencer ao clube e estar APTO ou MAL_CONDICIONADO. A resposta traz `club_id`, `formation`, `complete` e `players` na ordem do elenco, sem alterar o caixa. Sem escalação, `formation` é nulo e `players` é vazio; ao perder um titular por doença ou venda, a formação é preservada e `complete` passa a falso.
+
 ## Execução com Docker
 
 Siga a [execução na raiz](../README.md). A API em `http://localhost:3000` aplica migrations antes de iniciar, sem inserir dados de exemplo.
@@ -45,11 +47,11 @@ npm run format:check
 npm test
 ```
 
-Os testes unitários ficam em `test/unit/`, organizados por área: `common/`, `jogadores/`, `clubes/` e `mercado/`. Essa estrutura espelha os diretórios de `src/`. O Jest procura os arquivos `*.spec.ts` somente nessa pasta. O comando termina sozinho e inclui os exemplos de valor de mercado RN02–RN05.
+Os testes unitários ficam em `test/unit/`, organizados por área: `common/`, `jogadores/`, `clubes/`, `mercado/` e `liga/`. Essa estrutura espelha os diretórios de `src/`. O Jest procura os arquivos `*.spec.ts` somente nessa pasta. O comando termina sozinho e inclui os exemplos de valor de mercado RN02–RN05.
 
 ## Testes de integração
 
-Os testes em `test/integration/` fazem requisições HTTP contra NestJS usando PostgreSQL real. Ficam separados por módulo, em `test/integration/jogadores/`, `test/integration/clubes/` e `test/integration/mercado/`. Exigem um banco exclusivo terminado em `_test` e limpam suas tabelas a cada caso; nunca aponte para um banco com dados que você queira preservar.
+Os testes em `test/integration/` fazem requisições HTTP contra NestJS usando PostgreSQL real. Ficam separados por módulo, em `test/integration/jogadores/`, `test/integration/clubes/`, `test/integration/mercado/` e `test/integration/liga/`. Exigem um banco exclusivo terminado em `_test` e limpam suas tabelas a cada caso; nunca aponte para um banco com dados que você queira preservar.
 
 Na raiz, com o serviço `db` em execução, crie o banco de testes uma vez:
 
@@ -69,6 +71,8 @@ Na configuração local com porta `5434`, substitua `5432` nas URLs acima por `5
 São verificados cadastro, cabeçalho Location, formatos inválidos, filtros, paginação, ordenação, edição, exclusão lógica e atomicidade da alteração de condição dos jogadores. Para clubes, são verificados caixa inicial, normalização, unicidade de nome e sigla, ordenação, consulta e `404`. Para compra, são verificados os contratos, a transação, os limites de caixa e elenco, as recusas e o rollback da operação. Para venda, os testes cobrem multa, lucro, comissão, contrato, liberação do jogador, remoção da escalação, recompra, corpo ignorado e rollback de todos os efeitos.
 
 Histórico e CSV são verificados com o ciclo real de compra e venda: filtros combinados, totais, conciliação com o caixa, nomes e valores do momento, desempate por id, preservação após exclusão lógica, formatos de CSV e erros JSON na exportação.
+
+Os testes de escalação verificam as quatro formações, consulta vazia, ordenação, substituição, validações, preservação da escalação nas recusas e rollback em falha de gravação. Os elencos são formados por compras reais via API. Venda e alteração para DOENTE são testadas com escalação criada pelo endpoint, incluindo a ausência de retorno automático depois da recuperação.
 
 ## Variáveis
 
@@ -95,7 +99,7 @@ Histórico e CSV são verificados com o ciclo real de compra e venda: filtros co
 
 O backend usa arquitetura em camadas e o padrão Repository. O barema B2 exige separação entre controllers e regras/persistência, mas não exige um pattern específico. Essa estrutura também separa acesso ao banco dos serviços, para facilitar manutenção e testes.
 
-Dentro de `src/jogadores/`, `src/clubes/` e `src/mercado/`, cada pasta tem uma responsabilidade:
+Dentro de `src/jogadores/`, `src/clubes/`, `src/mercado/` e `src/liga/`, cada pasta tem uma responsabilidade:
 
 - `controllers/`: rotas, status HTTP e cabeçalhos. Recebe entradas validadas e chama o service.
 - `dto/`: tipos dos dados de cadastro, edição e consulta. Define contratos; os pipes validam esses contratos em execução.
@@ -112,6 +116,8 @@ Em `src/mercado/`, `CompraInputPipe` valida `club_id` e o formato de `loyalty_un
 A venda ignora o corpo, inclusive JSON malformado, conforme V1. Um jogador no elenco sem contrato ativo indica inconsistência dos dados: a venda retorna 500 sem gravar efeitos. Contratos ativos permanecem com esse status até a venda, mesmo após o prazo de fidelidade; nesse caso a venda os encerra sem multa.
 
 O histórico tem `HistoricoController`, `HistoricoService` e `HistoricoRepository` próprios dentro do módulo de mercado. JSON e CSV compartilham validação, consulta e apresentação das transações. O repository filtra e ordena no PostgreSQL, sem consultar os dados atuais do jogador para montar os registros históricos. `historico-resumo.ts` soma os valores com Decimal, e `historico-csv.presenter.ts` cuida do formato e do escape. Jogadores excluídos permanecem no histórico sem filtro; usá-los em `player_id` retorna 404. Sem registros, o JSON tem lista vazia e totais zerados, e o CSV contém somente cabeçalho e LF. O Content-Type CSV é definido após o sucesso da consulta, mantendo erros em JSON.
+
+Em `src/liga/`, `EscalacaoInputPipe` valida formação e ids; `escalacao.rules.ts` confere clube, condição e distribuição dos setores definidos em `formacoes.ts`. `EscalacoesService` coordena a substituição, e `EscalacoesRepository` grava formação e cinco titulares numa transação serializável. O presenter reutiliza a apresentação de jogadores e a ordenação compartilhada em `common/orderings/elenco.ordering.ts`, também usada pela consulta de clube. Conflitos concorrentes retornam 409, sem repetição automática.
 
 `src/common/` mantém tipos, cálculos e parsers reutilizados. `src/database/` gerencia a conexão Prisma. O endpoint de saúde delega a consulta técnica ao `HealthService`.
 

@@ -1,6 +1,6 @@
 import { apresentarJogador } from '../../jogadores/presenters/jogador.presenter';
 import { decimal } from '../../common/calculations/money.calculator';
-import { compararNomes } from '../../common/formatters/text.formatter';
+import { ordenarElenco } from '../../common/orderings/elenco.ordering';
 import { formatarDataHoraBrasilia } from '../../common/parsers/date.parser';
 import { ClubeComElenco } from '../repositories/clubes.repository';
 import { calcularFidelidade } from '../../mercado/domain/fidelidade.rules';
@@ -28,12 +28,12 @@ export function apresentarClube(
 
   return {
     ...resposta,
-    players: jogadores
-      .map((jogador) => ({
+    players: ordenarElenco(
+      jogadores.map((jogador) => ({
         ...jogador,
         contract: apresentarContrato(clube, jogador.id, momento),
-      }))
-      .sort(compararJogadoresDoElenco),
+      })),
+    ),
   };
 }
 
@@ -47,18 +47,6 @@ function apresentarContrato(clube: ClubeComElenco, jogadorId: number, momento: D
     remaining_days: fidelidade.diasRestantes,
     penalty_rate: fidelidade.percentualMulta,
   };
-}
-
-function compararJogadoresDoElenco(
-  esquerda: { position: string; name: string; id: number },
-  direita: { position: string; name: string; id: number },
-): number {
-  const ordem = ['GOL', 'ZAG', 'LAT', 'MEI', 'ATA'];
-  return (
-    ordem.indexOf(esquerda.position) - ordem.indexOf(direita.position) ||
-    compararNomes(esquerda.name, direita.name) ||
-    esquerda.id - direita.id
-  );
 }
 
 export type RespostaClube = ReturnType<typeof apresentarClube>;

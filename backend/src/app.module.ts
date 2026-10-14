@@ -6,6 +6,7 @@ import { PrismaModule } from './database/prisma.module';
 import { HealthModule } from './health/health.module';
 import { JogadoresModule } from './jogadores/jogadores.module';
 import { MercadoModule } from './mercado/mercado.module';
+import { LigaModule } from './liga/liga.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { MercadoModule } from './mercado/mercado.module';
     JogadoresModule,
     ClubesModule,
     MercadoModule,
+    LigaModule,
   ],
 })
 export class AppModule {}
