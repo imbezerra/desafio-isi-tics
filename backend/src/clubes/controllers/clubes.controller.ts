@@ -21,11 +21,13 @@ export class ClubesController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Consulta clube, elenco, contratos e patrimônio atual' })
   consultar(@Param('id', IdPipe) id: number) {
     return this.clubes.consultar(id);
   }
 
   @Post()
+  @ApiOperation({ summary: 'Cria um clube com caixa inicial de 300,00' })
   @ApiBody({ schema: { type: 'object', example: { name: 'Águias FC', acronym: 'AGU' } } })
   async cadastrar(
     @Body(CadastroClubePipe) entrada: CadastroClube,

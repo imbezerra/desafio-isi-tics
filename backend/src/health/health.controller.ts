@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { HealthService } from './health.service';
 
@@ -9,6 +9,7 @@ export class HealthController {
   constructor(private readonly health: HealthService) {}
 
   @Get()
+  @ApiOperation({ summary: 'Verifica se a API e o banco de dados estão disponíveis' })
   check(): Promise<{ status: 'ok' }> {
     return this.health.check();
   }

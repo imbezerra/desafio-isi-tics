@@ -40,11 +40,13 @@ export class JogadoresController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Consulta um jogador com indicadores e valores atuais' })
   consultar(@Param('id', IdPipe) id: number) {
     return this.jogadores.consultar(id);
   }
 
   @Post()
+  @ApiOperation({ summary: 'Cadastra um jogador livre e apto' })
   @ApiBody({
     schema: {
       type: 'object',
@@ -73,6 +75,7 @@ export class JogadoresController {
   }
 
   @Put(':id')
+  @ApiOperation({ summary: 'Atualiza os dados permitidos de um jogador' })
   @ApiBody({
     schema: {
       type: 'object',
@@ -84,6 +87,7 @@ export class JogadoresController {
   }
 
   @Patch(':id/condition')
+  @ApiOperation({ summary: 'Altera a condição física de um jogador' })
   @ApiBody({ schema: { type: 'object', example: { condition: 'MAL_CONDICIONADO' } } })
   alterarCondicao(@Param('id', IdPipe) id: number, @Body(CondicaoJogadorPipe) condicao: Condicao) {
     return this.jogadores.alterarCondicao(id, condicao);
@@ -91,6 +95,7 @@ export class JogadoresController {
 
   @Delete(':id')
   @HttpCode(204)
+  @ApiOperation({ summary: 'Exclui logicamente um jogador que esteja livre' })
   excluir(@Param('id', IdPipe) id: number) {
     return this.jogadores.excluir(id);
   }

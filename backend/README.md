@@ -1,6 +1,6 @@
 # Backend da liga
 
-API NestJS, Node.js 22, TypeScript e PostgreSQL 16. Regras e contrato: [enunciado](../docs/README.md). Os seis endpoints de jogadores estão implementados sob `/api/v1/players` e o cadastro/consulta de clubes sob `/api/v1/clubs`.
+API NestJS, Node.js 22, TypeScript e PostgreSQL 16. Regras e contrato: [enunciado](../docs/README.md). Os seis endpoints de jogadores estão implementados sob `/api/v1/players`, o cadastro/consulta de clubes sob `/api/v1/clubs` e a compra em `POST /api/v1/players/{id}/buy`.
 
 ## Execução com Docker
 
@@ -43,11 +43,11 @@ npm run format:check
 npm test
 ```
 
-Os testes unitários ficam em `test/unit/`, organizados por área: `common/calculations/`, `common/parsers/`, `jogadores/pipes/` e `jogadores/domain/`. Essa estrutura espelha os diretórios de `src/`. O Jest procura os arquivos `*.spec.ts` somente nessa pasta. O comando termina sozinho e inclui os exemplos de valor de mercado RN02–RN05.
+Os testes unitários ficam em `test/unit/`, organizados por área: `common/`, `jogadores/`, `clubes/` e `mercado/`. Essa estrutura espelha os diretórios de `src/`. O Jest procura os arquivos `*.spec.ts` somente nessa pasta. O comando termina sozinho e inclui os exemplos de valor de mercado RN02–RN05.
 
 ## Testes de integração
 
-Os testes em `test/integration/` fazem requisições HTTP contra NestJS usando PostgreSQL real. Ficam separados por módulo, em `test/integration/jogadores/` e `test/integration/clubes/`. Exigem um banco exclusivo terminado em `_test` e limpam suas tabelas a cada caso; nunca aponte para um banco com dados que você queira preservar.
+Os testes em `test/integration/` fazem requisições HTTP contra NestJS usando PostgreSQL real. Ficam separados por módulo, em `test/integration/jogadores/`, `test/integration/clubes/` e `test/integration/mercado/`. Exigem um banco exclusivo terminado em `_test` e limpam suas tabelas a cada caso; nunca aponte para um banco com dados que você queira preservar.
 
 Na raiz, com o serviço `db` em execução, crie o banco de testes uma vez:
 
@@ -64,7 +64,7 @@ TEST_DATABASE_URL='postgresql://liga_user:liga_password@localhost:5432/liga_fute
 
 Na configuração local com porta `5434`, substitua `5432` nas URLs acima por `5434`. O ambiente de teste utiliza porta HTTP temporária, sem disputar a porta da API Docker.
 
-São verificados cadastro, cabeçalho Location, formatos inválidos, filtros, paginação, ordenação, edição, exclusão lógica e atomicidade da alteração de condição dos jogadores. Para clubes, são verificados caixa inicial, normalização, unicidade de nome e sigla, ordenação, consulta e `404`.
+São verificados cadastro, cabeçalho Location, formatos inválidos, filtros, paginação, ordenação, edição, exclusão lógica e atomicidade da alteração de condição dos jogadores. Para clubes, são verificados caixa inicial, normalização, unicidade de nome e sigla, ordenação, consulta e `404`. Para compra, são verificados os contratos, a transação, os limites de caixa e elenco, as recusas e o rollback da operação.
 
 ## Variáveis
 
@@ -91,7 +91,7 @@ São verificados cadastro, cabeçalho Location, formatos inválidos, filtros, pa
 
 O backend usa arquitetura em camadas e o padrão Repository. O barema B2 exige separação entre controllers e regras/persistência, mas não exige um pattern específico. Essa estrutura também separa acesso ao banco dos serviços, para facilitar manutenção e testes.
 
-Dentro de `src/jogadores/` e `src/clubes/`, cada pasta tem uma responsabilidade:
+Dentro de `src/jogadores/`, `src/clubes/` e `src/mercado/`, cada pasta tem uma responsabilidade:
 
 - `controllers/`: rotas, status HTTP e cabeçalhos. Recebe entradas validadas e chama o service.
 - `dto/`: tipos dos dados de cadastro, edição e consulta. Define contratos; os pipes validam esses contratos em execução.
@@ -103,13 +103,15 @@ Dentro de `src/jogadores/` e `src/clubes/`, cada pasta tem uma responsabilidade:
 - `swagger/`: documentação dos parâmetros da API.
 - `jogadores.module.ts`: registra controller, service e repository para injeção de dependências.
 
+Em `src/mercado/`, `CompraInputPipe` valida `club_id` e o formato de `loyalty_until`; `compra.rules.ts` aplica o prazo, a taxa e os limites de caixa e elenco. `MercadoService` coordena a compra, enquanto `MercadoRepository` concentra as consultas e faz caixa, vínculo do jogador, contrato e transação participarem da mesma transação serializável. `compra.presenter.ts` monta a resposta `200` com os valores do momento. `fidelidade.rules.ts` calcula dias restantes e percentual de multa para a consulta do clube e para a futura venda.
+
 `src/common/` mantém tipos, cálculos e parsers reutilizados. `src/database/` gerencia a conexão Prisma. O endpoint de saúde delega a consulta técnica ao `HealthService`.
 
 ### Transações e erros
 
 O service delimita a operação chamando `repository.emTransacao(...)`. O repository entrega ao callback uma instância vinculada ao cliente transacional. Assim, ler o jogador, remover da escalação e gravar a condição usam a mesma transação serializável. Uma falha desfaz tudo; o teste de integração simula essa situação no PostgreSQL.
 
-As regras de domínio lançam `RegraNegocioError`, sem depender de HTTP. O filtro central converte essa falha em `409` com `message`. Formatos inválidos são recusados pelos pipes com `400`, e o service responde `404` quando não encontra o recurso ativo.
+As regras de domínio lançam `RegraNegocioError`, sem depender de HTTP. O filtro central converte essa falha em `409` com `message`. Prazo de fidelidade fora da faixa lança `EntradaInvalidaError`, convertido em `400`. Formatos inválidos são recusados pelos pipes com `400`, e o service responde `404` quando não encontra o recurso ativo.
 
 Essa é uma arquitetura em camadas pragmática, não uma implementação completa de Clean Architecture: o repository retorna registros tipados pelo Prisma e o presenter conhece esse formato. A dependência do ORM está explícita nessa fronteira, enquanto as regras de domínio permanecem independentes.
 

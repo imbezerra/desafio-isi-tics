@@ -1,5 +1,5 @@
 import { POSICOES } from '../../common/domain.types';
-import { normalizarParaOrdenacao } from '../../common/formatters/text.formatter';
+import { compararNomes, normalizarParaOrdenacao } from '../../common/formatters/text.formatter';
 import { ConsultaJogadores, OrdenacaoJogador } from '../dto/jogador.dto';
 
 type JogadorNaLista = {
@@ -22,15 +22,8 @@ function comparar(a: JogadorNaLista, b: JogadorNaLista, criterio: OrdenacaoJogad
       return b.age - a.age;
     case 'position':
       return POSICOES.indexOf(a.position) - POSICOES.indexOf(b.position);
-    case 'name': {
-      const primeiro = [...normalizarParaOrdenacao(a.name)];
-      const segundo = [...normalizarParaOrdenacao(b.name)];
-      for (let i = 0; i < Math.min(primeiro.length, segundo.length); i++) {
-        const diferenca = primeiro[i].codePointAt(0)! - segundo[i].codePointAt(0)!;
-        if (diferenca !== 0) return diferenca;
-      }
-      return primeiro.length - segundo.length;
-    }
+    case 'name':
+      return compararNomes(a.name, b.name);
   }
 }
 

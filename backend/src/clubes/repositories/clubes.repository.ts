@@ -7,7 +7,7 @@ import { CadastroClube } from '../dto/clube.dto';
 const clubeComElenco = {
   jogadores: {
     where: { excluidoEm: null },
-    include: { contratos: { where: { situacao: 'ATIVO' } } },
+    include: { contratos: { where: { situacao: 'ATIVO' }, orderBy: { id: 'desc' } } },
   },
 } satisfies Prisma.ClubeInclude;
 
