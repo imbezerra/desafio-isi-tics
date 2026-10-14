@@ -17,3 +17,5 @@ export function apresentarTransacao(transacao: Transacao) {
     created_at: formatarDataHoraBrasilia(transacao.criadoEm),
   };
 }
+
+export type RespostaTransacao = ReturnType<typeof apresentarTransacao>;

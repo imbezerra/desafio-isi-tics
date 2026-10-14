@@ -2,6 +2,8 @@
 
 API NestJS, Node.js 22, TypeScript e PostgreSQL 16. Regras e contrato: [enunciado](../docs/README.md). Os seis endpoints de jogadores estão implementados sob `/api/v1/players`, o cadastro/consulta de clubes sob `/api/v1/clubs`, a compra em `POST /api/v1/players/{id}/buy` e a venda em `POST /api/v1/players/{id}/sell`.
 
+O histórico está disponível em `GET /api/v1/clubs/{id}/transactions` e a exportação CSV em `GET /api/v1/clubs/{id}/transactions/export`. Ambos aceitam `type` (`COMPRA`, `VENDA` ou os dois separados por vírgula, sem espaços e sem repetição) e `player_id`. Exemplo: `/api/v1/clubs/1/transactions?type=VENDA&player_id=2`. O JSON inclui `data` e `summary`, com os totais dos mesmos registros filtrados. O CSV preserva essa ordem e usa UTF-8 sem BOM, separador `;`, vírgula decimal e LF inclusive na última linha.
+
 ## Execução com Docker
 
 Siga a [execução na raiz](../README.md). A API em `http://localhost:3000` aplica migrations antes de iniciar, sem inserir dados de exemplo.
@@ -66,6 +68,8 @@ Na configuração local com porta `5434`, substitua `5432` nas URLs acima por `5
 
 São verificados cadastro, cabeçalho Location, formatos inválidos, filtros, paginação, ordenação, edição, exclusão lógica e atomicidade da alteração de condição dos jogadores. Para clubes, são verificados caixa inicial, normalização, unicidade de nome e sigla, ordenação, consulta e `404`. Para compra, são verificados os contratos, a transação, os limites de caixa e elenco, as recusas e o rollback da operação. Para venda, os testes cobrem multa, lucro, comissão, contrato, liberação do jogador, remoção da escalação, recompra, corpo ignorado e rollback de todos os efeitos.
 
+Histórico e CSV são verificados com o ciclo real de compra e venda: filtros combinados, totais, conciliação com o caixa, nomes e valores do momento, desempate por id, preservação após exclusão lógica, formatos de CSV e erros JSON na exportação.
+
 ## Variáveis
 
 - `DATABASE_URL`: conexão PostgreSQL, usada pelo Prisma.
@@ -106,6 +110,8 @@ Dentro de `src/jogadores/`, `src/clubes/` e `src/mercado/`, cada pasta tem uma r
 Em `src/mercado/`, `CompraInputPipe` valida `club_id` e o formato de `loyalty_until`; `compra.rules.ts` aplica o prazo, a taxa e os limites de caixa e elenco. `venda.rules.ts` calcula multa, lucro, comissão progressiva, crédito e situação final do contrato. `MercadoService` coordena compra e venda, enquanto `MercadoRepository` concentra as consultas e faz caixa, vínculo do jogador, contrato, transação e saída da escalação participarem da mesma transação serializável. Os presenters montam as respostas `200` usando um mapeamento compartilhado de transação. `fidelidade.rules.ts` calcula dias restantes e percentual de multa para a consulta do clube e para a venda.
 
 A venda ignora o corpo, inclusive JSON malformado, conforme V1. Um jogador no elenco sem contrato ativo indica inconsistência dos dados: a venda retorna 500 sem gravar efeitos. Contratos ativos permanecem com esse status até a venda, mesmo após o prazo de fidelidade; nesse caso a venda os encerra sem multa.
+
+O histórico tem `HistoricoController`, `HistoricoService` e `HistoricoRepository` próprios dentro do módulo de mercado. JSON e CSV compartilham validação, consulta e apresentação das transações. O repository filtra e ordena no PostgreSQL, sem consultar os dados atuais do jogador para montar os registros históricos. `historico-resumo.ts` soma os valores com Decimal, e `historico-csv.presenter.ts` cuida do formato e do escape. Jogadores excluídos permanecem no histórico sem filtro; usá-los em `player_id` retorna 404. Sem registros, o JSON tem lista vazia e totais zerados, e o CSV contém somente cabeçalho e LF. O Content-Type CSV é definido após o sucesso da consulta, mantendo erros em JSON.
 
 `src/common/` mantém tipos, cálculos e parsers reutilizados. `src/database/` gerencia a conexão Prisma. O endpoint de saúde delega a consulta técnica ao `HealthService`.
 
