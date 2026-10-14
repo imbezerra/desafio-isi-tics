@@ -25,8 +25,17 @@
     "@prisma/client": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "decimal.js": "^10.6.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
+  },
+  "jest": {
+    "moduleFileExtensions": ["js", "json", "ts"],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    }
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -52,4 +61,3 @@
     "typescript-eslint": "^8.20.0"
   }
 }
-
