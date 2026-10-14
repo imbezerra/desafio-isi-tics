@@ -1,5 +1,5 @@
 export function normalizarTexto(valor: string): string {
-  return valor.trim().replace(/ {2,}/g, ' ');
+  return valor.replace(/^ +| +$/g, '').replace(/ {2,}/g, ' ');
 }
 
 export function removerAcentos(valor: string): string {

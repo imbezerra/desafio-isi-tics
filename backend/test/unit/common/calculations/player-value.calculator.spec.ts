@@ -1,10 +1,10 @@
-import { AtributosJogador } from '../domain.types';
+import { AtributosJogador } from '../../../../src/common/domain.types';
 
 import {
   calcularOverall,
   calcularValorBase,
   calcularValorMercado,
-} from './player-value.calculator';
+} from '../../../../src/common/calculations/player-value.calculator';
 
 const atributosMeia: AtributosJogador = {
   pace: 68,

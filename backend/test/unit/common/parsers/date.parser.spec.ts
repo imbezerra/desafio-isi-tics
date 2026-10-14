@@ -1,6 +1,9 @@
 import { BadRequestException } from '@nestjs/common';
 
-import { formatarDataHoraBrasilia, parseDataHoraBrasilia } from './date.parser';
+import {
+  formatarDataHoraBrasilia,
+  parseDataHoraBrasilia,
+} from '../../../../src/common/parsers/date.parser';
 
 describe('datas no horário de Brasília', () => {
   it('aceita o formato estrito e preserva o instante', () => {

@@ -1,17 +1,15 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { PrismaService } from '../database/prisma.service';
+import { HealthService } from './health.service';
 
 @ApiTags('Saúde')
 @Controller('health')
 export class HealthController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly health: HealthService) {}
 
   @Get()
-  async check(): Promise<{ status: 'ok' }> {
-    await this.prisma.$queryRaw`SELECT 1`;
-
-    return { status: 'ok' };
+  check(): Promise<{ status: 'ok' }> {
+    return this.health.check();
   }
 }
