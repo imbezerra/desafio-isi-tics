@@ -51,6 +51,7 @@ Para executar a API fora do Docker e rodar verificações, consulte [backend/REA
 - `backend/src/common/`: tipos, cálculos, normalização de texto, parsers e tratamento central de erros.
 - `backend/src/database/`: conexão Prisma.
 - `backend/src/jogadores/`: módulo separado em controllers, DTOs, pipes, services, repositories, domínio, presenters e Swagger.
+- `backend/src/clubes/`: módulo de cadastro e consulta de clubes, com a mesma separação em camadas.
 - `backend/test/unit/`: testes unitários organizados por área, espelhando os diretórios de `src/`.
 - `backend/test/integration/`: testes de integração HTTP organizados por módulo, com PostgreSQL exclusivo.
 - `backend/prisma/`: modelo de dados e migrations versionadas das sete tabelas obrigatórias.
@@ -71,8 +72,8 @@ As bibliotecas e os motivos de uso estão descritos no README do backend.
 
 ## Funcionalidades não implementadas
 
-Cadastro/consulta de clubes; compra e venda; contratos e histórico de transações; exportação CSV; gerenciamento de escalações; partidas e classificação; interface React; logs HTTP por requisição. A mudança para `DOENTE` já remove o titular de uma escalação existente atomicamente, preparando a integração com o módulo da liga.
+Compra e venda; contratos e histórico de transações; exportação CSV; gerenciamento de escalações; partidas e classificação; interface React; logs HTTP por requisição. A mudança para `DOENTE` já remove o titular de uma escalação existente atomicamente, preparando a integração com o módulo da liga.
 
 ## Uso de inteligência artificial
 
-Foi utilizado Codex para analisar `docs/`, propor a stack, implementar a estrutura NestJS/Docker/Prisma, os arquivos de `backend/src/common/`, o módulo `backend/src/jogadores/`, testes e documentação. A ferramenta foi usada para traduzir os requisitos em código e conferir comportamento com testes locais e PostgreSQL real. Foram aceitas a estrutura modular e as funções reutilizáveis; a sugestão alternativa de FastAPI foi descartada em favor de NestJS. O desenvolvimento é explicado ao responsável pelo projeto, que aprova cada commit. A declaração será atualizada conforme novas funcionalidades forem implementadas.
+Foi utilizado Codex para analisar `docs/`, propor a stack, implementar a estrutura NestJS/Docker/Prisma, os arquivos de `backend/src/common/`, os módulos `backend/src/jogadores/` e `backend/src/clubes/`, testes e documentação. A ferramenta foi usada para traduzir os requisitos em código e conferir comportamento com testes locais e PostgreSQL real. Foram aceitas a estrutura modular e as funções reutilizáveis; a sugestão alternativa de FastAPI foi descartada em favor de NestJS. O desenvolvimento é explicado ao responsável pelo projeto, que aprova cada commit. A declaração será atualizada conforme novas funcionalidades forem implementadas.

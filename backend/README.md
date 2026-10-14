@@ -1,6 +1,6 @@
 # Backend da liga
 
-API NestJS, Node.js 22, TypeScript e PostgreSQL 16. Regras e contrato: [enunciado](../docs/README.md). Os seis endpoints de jogadores estão implementados sob `/api/v1/players`.
+API NestJS, Node.js 22, TypeScript e PostgreSQL 16. Regras e contrato: [enunciado](../docs/README.md). Os seis endpoints de jogadores estão implementados sob `/api/v1/players` e o cadastro/consulta de clubes sob `/api/v1/clubs`.
 
 ## Execução com Docker
 
@@ -47,7 +47,7 @@ Os testes unitários ficam em `test/unit/`, organizados por área: `common/calcu
 
 ## Testes de integração
 
-Os testes em `test/integration/` fazem requisições HTTP contra NestJS usando PostgreSQL real. Ficam separados por módulo; os atuais estão em `test/integration/jogadores/`. Exigem um banco exclusivo terminado em `_test` e limpam suas tabelas a cada caso; nunca aponte para um banco com dados que você queira preservar.
+Os testes em `test/integration/` fazem requisições HTTP contra NestJS usando PostgreSQL real. Ficam separados por módulo, em `test/integration/jogadores/` e `test/integration/clubes/`. Exigem um banco exclusivo terminado em `_test` e limpam suas tabelas a cada caso; nunca aponte para um banco com dados que você queira preservar.
 
 Na raiz, com o serviço `db` em execução, crie o banco de testes uma vez:
 
@@ -64,7 +64,7 @@ TEST_DATABASE_URL='postgresql://liga_user:liga_password@localhost:5432/liga_fute
 
 Na configuração local com porta `5434`, substitua `5432` nas URLs acima por `5434`. O ambiente de teste utiliza porta HTTP temporária, sem disputar a porta da API Docker.
 
-São verificados cadastro, cabeçalho Location, formatos inválidos, filtros, paginação, ordenação, edição, exclusão lógica e atomicidade da alteração de condição. Clubes e escalações de teste são preparados diretamente no banco, pois os endpoints correspondentes ainda serão desenvolvidos.
+São verificados cadastro, cabeçalho Location, formatos inválidos, filtros, paginação, ordenação, edição, exclusão lógica e atomicidade da alteração de condição dos jogadores. Para clubes, são verificados caixa inicial, normalização, unicidade de nome e sigla, ordenação, consulta e `404`.
 
 ## Variáveis
 
@@ -91,7 +91,7 @@ São verificados cadastro, cabeçalho Location, formatos inválidos, filtros, pa
 
 O backend usa arquitetura em camadas e o padrão Repository. O barema B2 exige separação entre controllers e regras/persistência, mas não exige um pattern específico. Essa estrutura também separa acesso ao banco dos serviços, para facilitar manutenção e testes.
 
-Dentro de `src/jogadores/`, cada pasta tem uma responsabilidade:
+Dentro de `src/jogadores/` e `src/clubes/`, cada pasta tem uma responsabilidade:
 
 - `controllers/`: rotas, status HTTP e cabeçalhos. Recebe entradas validadas e chama o service.
 - `dto/`: tipos dos dados de cadastro, edição e consulta. Define contratos; os pipes validam esses contratos em execução.

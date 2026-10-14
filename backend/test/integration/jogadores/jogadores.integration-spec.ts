@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing';
 import { PrismaClient } from '@prisma/client';
 
 import { configurarApi } from '../../../src/app.config';
+import { ClubesModule } from '../../../src/clubes/clubes.module';
 import { PrismaService } from '../../../src/database/prisma.service';
 import { PrismaModule } from '../../../src/database/prisma.module';
 import { RespostaJogador } from '../../../src/jogadores/presenters/jogador.presenter';
@@ -61,7 +62,9 @@ describe('API de jogadores com PostgreSQL real', () => {
   }
 
   beforeAll(async () => {
-    const modulo = await Test.createTestingModule({ imports: [PrismaModule, JogadoresModule] })
+    const modulo = await Test.createTestingModule({
+      imports: [PrismaModule, JogadoresModule, ClubesModule],
+    })
       .overrideProvider(PrismaService)
       .useValue(banco)
       .compile();
