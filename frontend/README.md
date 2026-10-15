@@ -21,7 +21,7 @@ A interface está em http://localhost:5173. A porta é fixa; encerre outra inst�
 
 ## Variáveis de ambiente
 
-VITE_API_URL=http://localhost:3000 será a origem pública da API, sem /api/v1. Não use essa variável para segredos. O cliente HTTP será adicionado na próxima etapa.
+VITE_API_URL=http://localhost:3000 será a origem pública da API, sem /api/v1. Não use essa variável para segredos. O cliente HTTP acrescenta o prefixo /api/v1 a essa origem.
 
 ## Estrutura e bibliotecas
 
@@ -52,16 +52,18 @@ npm run build
 
 ## Funcionalidades não implementadas
 
-Esta etapa prepara a base. Cliente HTTP, contratos, consultas do resumo da liga, estrutura lateral e componentes compartilhados estão disponíveis. A tela inicial está disponível; consulta de jogadores e Docker serão adicionados nos commits seguintes.
+A base, o cliente HTTP, os componentes compartilhados, a tela inicial e a consulta de jogadores estão implementados. Docker será integrado no próximo commit. Ainda faltam cadastro, edição, condição, exclusão, clubes, compra, venda, histórico/CSV, escalação, partidas e classificação. Mobile não faz parte do escopo atual solicitado.
 
 ## Uso de inteligência artificial
 
 Será preenchido posteriormente
 
-## Camada de consultas e componentes compartilhados
+## Telas, consultas e componentes compartilhados
 
-src/shared/api concentra fetch, contratos e mensagens de falha. src/features/overview consulta a API por hooks de dados. src/shared/components fornece tabela, paginação, campos, mensagens, marca e estrutura lateral. src/shared/formatters limita-se à apresentação em pt-BR. src/styles/global.css e os SVGs locais mantêm o visual compartilhado. Os testes verificam HTTP, cancelamento, mensagens, formatação e estados da tabela.
+src/features/home implementa a tela inicial do Figma com números reais da liga. src/features/players separa tela, filtros, serviço HTTP e hooks. src/features/overview consulta clubes e o resumo da liga. src/shared/api concentra fetch, contratos e erros; shared/components compartilha tabela, paginação, campos, mensagens, marca e estrutura lateral. shared/formatters limita-se à apresentação em pt-BR. Os SVGs do Figma são servidos localmente.
 
-## Tela inicial
+## Consulta de jogadores e critérios de avaliação
 
-src/features/home implementa a referência desktop do Figma com SVGs locais, contadores reais, líder devolvido pela API quando há partidas e navegação por Iniciar ou Enter. A rota /players informa que a consulta será disponibilizada na próxima etapa. Os testes conferem a apresentação da liga, navegação e página não encontrada.
+A tabela mostra as colunas obrigatórias da API, na ordem recebida. Paginação de dez itens, busca, filtros combináveis e ordenação são enviados ao backend. Selecionar Só livres limpa e desabilita o filtro por clube, prevenção permitida pelo enunciado. Nova combinação volta à página 1. Carregamento, lista vazia, erro e nova tentativa usam componentes compartilhados; recusas preservam o message da API. Não há recálculo de regras de negócio no frontend.
+
+Os testes verificam cliente HTTP, apresentação, estados da tabela, filtros, navegação e paginação. Os componentes cobrem os primeiros itens F01/F02; a pontuação só pode ser confirmada pela banca. O restante do fluxo será implementado nas próximas entregas.

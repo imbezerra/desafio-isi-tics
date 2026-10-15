@@ -1,5 +1,6 @@
 import { Link, Route, Routes } from 'react-router';
 import { HomePage } from '../features/home/HomePage';
+import { PlayersPage } from '../features/players/PlayersPage';
 
 export function App() {
   return (
@@ -9,16 +10,7 @@ export function App() {
       </a>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route
-          path="/players"
-          element={
-            <main id="main-content" className="not-found">
-              <h1>Jogadores</h1>
-              <p>A consulta de jogadores será disponibilizada na próxima etapa.</p>
-              <Link to="/">Voltar ao início</Link>
-            </main>
-          }
-        />
+        <Route path="/players" element={<PlayersPage />} />
         <Route
           path="*"
           element={

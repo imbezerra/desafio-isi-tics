@@ -17,13 +17,13 @@ describe('Tela inicial e navegação sem recarga', () => {
     mockApi();
     renderApp();
     await userEvent.click(screen.getByRole('link', { name: 'Iniciar' }));
-    expect(await screen.findByRole('heading', { name: 'Jogadores' })).toBeInTheDocument();
+    expect(await screen.findByText('João Silva')).toBeInTheDocument();
   });
   it('navega pelo atalho Enter fora de campos interativos', async () => {
     mockApi();
     renderApp();
     await userEvent.keyboard('{Enter}');
-    expect(await screen.findByRole('heading', { name: 'Jogadores' })).toBeInTheDocument();
+    expect(await screen.findByText('João Silva')).toBeInTheDocument();
   });
   it('trata caminhos inexistentes', () => {
     renderApp('/pagina-inexistente');
