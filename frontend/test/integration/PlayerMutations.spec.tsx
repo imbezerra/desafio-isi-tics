@@ -1,13 +1,8 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
-
 import userEvent from '@testing-library/user-event';
-
 import { describe, expect, it } from 'vitest';
-
 import { player } from '../fixtures/league.fixture';
-
 import { mockPlayerApi } from '../helpers/mock-player-api';
-
 import { renderApp } from '../helpers/render-app';
 
 async function openAction(
@@ -51,6 +46,7 @@ const flows = [
   { kind: 'create', method: 'POST', label: 'Salvar jogador', menu: '' },
   { kind: 'edit', method: 'PUT', label: 'Salvar alterações', menu: 'Editar' },
   { kind: 'condition', method: 'PATCH', label: 'Salvar condição', menu: 'Alterar condição' },
+  { kind: 'delete', method: 'DELETE', label: 'Excluir jogador', menu: 'Excluir' },
 ] as const;
 
 async function prepareFlow(user: ReturnType<typeof userEvent.setup>, flow: (typeof flows)[number]) {
@@ -210,7 +206,7 @@ describe('Detalhes e edição', () => {
   });
 });
 
-describe('Condição física', () => {
+describe('Condição e exclusão', () => {
   it('atualiza condição e mercado pela API e reaplica o filtro sem recarregar', async () => {
     const api = mockPlayerApi();
     const user = userEvent.setup();
@@ -244,6 +240,53 @@ describe('Condição física', () => {
 
     expect(api.writes('PATCH')).toHaveLength(0);
   });
+
+  it('exige confirmação e permite cancelar a exclusão sem pedido', async () => {
+    const api = mockPlayerApi();
+    const user = userEvent.setup();
+
+    renderApp('/players');
+    await openAction(user, 'Excluir');
+    expect(api.writes('DELETE')).toHaveLength(0);
+    await user.click(screen.getByRole('button', { name: 'Cancelar' }));
+    expect(api.writes('DELETE')).toHaveLength(0);
+    expect(within(screen.getByRole('table')).getByText(player.name)).toBeInTheDocument();
+  });
+
+  it('trata DELETE 204 sem ler JSON e retira o jogador da lista e contadores', async () => {
+    const api = mockPlayerApi();
+    const user = userEvent.setup();
+
+    renderApp('/players');
+    await openAction(user, 'Excluir');
+    await user.click(screen.getByRole('button', { name: 'Excluir jogador' }));
+    await screen.findByText('João Silva excluído com sucesso.');
+    expect(screen.getByText(/Nenhum jogador encontrado/)).toBeInTheDocument();
+    expect(screen.getByText('0 resultados')).toBeInTheDocument();
+    expect(api.writes('DELETE')).toHaveLength(1);
+    expect(api.writes('DELETE')[0][1]).not.toHaveProperty('body');
+  });
+
+  it('volta uma página ao excluir o único jogador da última página', async () => {
+    mockPlayerApi({
+      initial: Array.from({ length: 11 }, (_, index) => ({
+        ...player,
+        id: index + 1,
+        name: `Jogador ${index + 1} Silva`,
+      })),
+    });
+
+    const user = userEvent.setup();
+
+    renderApp('/players');
+    await screen.findByText('11 resultados');
+    await user.click(screen.getByRole('button', { name: 'Próxima' }));
+    await openAction(user, 'Excluir', 'Jogador 11 Silva');
+    await user.click(screen.getByRole('button', { name: 'Excluir jogador' }));
+    await screen.findByText('Jogador 11 Silva excluído com sucesso.');
+    expect(await screen.findByText('1 / 1')).toBeInTheDocument();
+    expect(screen.getByText('Mostrando 1–10 de 10 jogadores')).toBeInTheDocument();
+  });
 });
 
 describe.each(flows)('Proteção de envio e recusas: $kind', (flow) => {
@@ -267,7 +310,7 @@ describe.each(flows)('Proteção de envio e recusas: $kind', (flow) => {
     expect(screen.getByRole('button', { name: 'Fechar janela' })).toBeDisabled();
     fireEvent(dialog, new Event('cancel', { cancelable: true }));
     expect(dialog).toBeInTheDocument();
-    release(Response.json(player));
+    release(flow.method === 'DELETE' ? new Response(null, { status: 204 }) : Response.json(player));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(api.writes(flow.method)).toHaveLength(1);
   });

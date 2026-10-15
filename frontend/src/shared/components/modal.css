@@ -87,6 +87,15 @@ body:has(dialog[open]) {
   border-top: 1px solid var(--border);
 }
 
+.button-destructive {
+  color: #fff;
+  background: #e40016;
+}
+
+.button-destructive:hover {
+  background: #be0012;
+}
+
 .field input:disabled {
   color: var(--muted-foreground);
   background: var(--muted);

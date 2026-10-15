@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import type { Player } from '../../shared/api/contracts';
 import { Icon } from '../../shared/components/Icon';
 
-export type PlayerAction = 'details' | 'edit' | 'condition';
+export type PlayerAction = 'details' | 'edit' | 'condition' | 'delete';
 
 export function PlayerActions({
   player,
@@ -65,6 +65,9 @@ export function PlayerActions({
     { kind: 'details', label: 'Ver detalhes', icon: 'action-details' },
     { kind: 'edit', label: 'Editar', icon: 'action-edit' },
     { kind: 'condition', label: 'Alterar condição', icon: 'action-condition' },
+    ...(player.club_id === null
+      ? [{ kind: 'delete' as const, label: 'Excluir', icon: 'action-delete' }]
+      : []),
   ];
 
   return (
@@ -130,6 +133,7 @@ export function PlayerActions({
                 type="button"
                 role="menuitem"
                 key={action.kind}
+                className={action.kind === 'delete' ? 'destructive-action' : ''}
                 onClick={() => select(action.kind)}
               >
                 <Icon name={action.icon} />

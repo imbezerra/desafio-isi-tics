@@ -19,7 +19,7 @@ export function PlayerDialog({
   onSaved,
 }: {
   id: number;
-  kind: PlayerAction;
+  kind: Exclude<PlayerAction, 'delete'>;
   clubs: Club[];
   onClose: () => void;
   onSelect: (kind: PlayerAction, player: Player) => void;

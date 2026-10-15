@@ -25,6 +25,10 @@ export function changePlayerCondition(id: number, condition: PlayerCondition) {
   return apiWrite<Player>('PATCH', `/players/${id}/condition`, { condition });
 }
 
+export function deletePlayer(id: number) {
+  return apiWrite<void>('DELETE', `/players/${id}`);
+}
+
 export interface PlayerFilters {
   search: string;
   position: string;

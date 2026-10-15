@@ -15,6 +15,7 @@ import { conditions, positions } from './player-fields';
 import { PlayerActions, type PlayerAction } from './PlayerActions';
 import { PlayerForm } from './PlayerForm';
 import { PlayerDialog } from './PlayerDialog';
+import { DeletePlayerDialog } from './DeletePlayerDialog';
 import { PlayerResult } from './PlayerResult';
 import './players.css';
 import './player-dialogs.css';
@@ -149,6 +150,17 @@ export function PlayersPage() {
     setSelection(undefined);
   }
 
+  async function deleted() {
+    if (!selection || selection.kind === 'create') return;
+
+    queryClient.removeQueries({ queryKey: ['player', selection.player.id], exact: true });
+
+    if (page > 1 && players.data?.data.length === 1) setPage(page - 1);
+    await queryClient.invalidateQueries();
+    setNotice({ message: `${selection.player.name} excluído com sucesso.` });
+    setSelection(undefined);
+  }
+
   function applyFilters(next: PlayerFilters) {
     setFilters(next);
     setPage(1);
@@ -235,7 +247,14 @@ export function PlayersPage() {
       {selection?.kind === 'create' && (
         <PlayerForm onClose={() => setSelection(undefined)} onSaved={saved} />
       )}
-      {selection && selection.kind !== 'create' && (
+      {selection?.kind === 'delete' && (
+        <DeletePlayerDialog
+          player={selection.player}
+          onClose={() => setSelection(undefined)}
+          onDeleted={deleted}
+        />
+      )}
+      {selection && selection.kind !== 'create' && selection.kind !== 'delete' && (
         <PlayerDialog
           key={`${selection.kind}-${selection.player.id}`}
           id={selection.player.id}

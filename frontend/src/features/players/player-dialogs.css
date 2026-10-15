@@ -340,3 +340,9 @@ meter::-webkit-meter-optimum-value {
 .player-actions-menu > button:focus-visible {
   background: var(--muted);
 }
+
+.player-actions-menu .destructive-action {
+  color: #e40016;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
