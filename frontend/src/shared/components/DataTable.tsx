@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react';
 import { Message } from './Message';
+
 export interface Column<T> {
   key: string;
   label: string;
   render: (row: T) => ReactNode;
   numeric?: boolean;
 }
+
 export function DataTable<T>({
   label,
   columns,
@@ -34,6 +36,7 @@ export function DataTable<T>({
         <div className="skeleton" />
       </div>
     );
+
   if (error)
     return (
       <div className="table-state">
@@ -42,12 +45,14 @@ export function DataTable<T>({
         </Message>
       </div>
     );
+
   if (rows.length === 0)
     return (
       <div className="table-state">
         <Message>{emptyMessage}</Message>
       </div>
     );
+
   return (
     <div
       className="table-scroll"

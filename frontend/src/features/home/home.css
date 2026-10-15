@@ -1,6 +1,7 @@
 .home-page {
   min-height: 100svh;
 }
+
 .home-stage {
   position: relative;
   min-height: 100svh;
@@ -12,6 +13,7 @@
   padding: 64px 24px;
   overflow: hidden;
 }
+
 .pitch-decoration {
   position: absolute;
   left: 50%;
@@ -19,6 +21,7 @@
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
+
 .home-content {
   position: relative;
   display: flex;
@@ -30,6 +33,7 @@
   border-radius: 24px;
   background: #fff;
 }
+
 .league-badge {
   display: flex;
   gap: 8px;
@@ -40,21 +44,25 @@
   font-size: 12px;
   white-space: nowrap;
 }
+
 .status-dot {
   width: 8px;
   height: 8px;
   border-radius: 4px;
   background: var(--success);
 }
+
 .home-titles {
   text-align: center;
 }
+
 .home-titles h1 {
   font-size: 40px;
   line-height: 48px;
   letter-spacing: -1px;
   white-space: nowrap;
 }
+
 .home-titles p {
   font-size: 16px;
   line-height: 24px;
@@ -62,15 +70,18 @@
   margin-top: 12px;
   width: 800px;
 }
+
 .home-action {
   display: flex;
   align-items: center;
   gap: 14px;
 }
+
 .home-action > .button {
   width: 200px;
   min-height: 40px;
 }
+
 kbd {
   font:
     500 12px 'Geist',
@@ -81,6 +92,7 @@ kbd {
   background: var(--muted);
   margin-left: 4px;
 }
+
 .league-numbers {
   display: flex;
   align-items: center;
@@ -89,11 +101,13 @@ kbd {
   font-size: 12px;
   white-space: nowrap;
 }
+
 .league-numbers > span {
   display: flex;
   align-items: center;
   gap: 6px;
 }
+
 .league-numbers > span + span::before {
   content: '';
   width: 3px;
@@ -102,10 +116,12 @@ kbd {
   border-radius: 2px;
   margin-right: 10px;
 }
+
 .league-numbers strong {
   color: var(--foreground);
   font-weight: 500;
 }
+
 .steps {
   display: flex;
   align-items: center;
@@ -113,6 +129,7 @@ kbd {
   gap: 8px;
   position: relative;
 }
+
 .step-card {
   width: 172px;
   height: 158px;
@@ -125,11 +142,13 @@ kbd {
   flex-direction: column;
   gap: 10px;
 }
+
 .step-top {
   display: flex;
   align-items: center;
   gap: 8px;
 }
+
 .step-icon {
   width: 32px;
   height: 32px;
@@ -138,23 +157,27 @@ kbd {
   display: grid;
   place-items: center;
 }
+
 .step-number {
   font:
     12px 'Geist Mono',
     monospace;
   color: var(--muted-foreground);
 }
+
 .step-card h2 {
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
 }
+
 .step-card p {
   font-size: 12px;
   color: var(--muted-foreground);
   line-height: 16px;
   margin-top: 2px;
 }
+
 .home-footer {
   position: relative;
   display: flex;

@@ -8,6 +8,7 @@ export const club: Club = {
   squad_value: 0,
   net_worth: 300,
 };
+
 export const player: Player = {
   id: 1,
   name: 'João Silva',

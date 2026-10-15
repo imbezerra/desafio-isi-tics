@@ -74,6 +74,7 @@ No Compose, a variável vem do `.env` da raiz e é passada como argumento de bui
 - TanStack React Query 5: cache, cancelamento por `AbortSignal`, estados de consulta e atualização por invalidação, sem recarregar a página.
 - `@fontsource/geist` e `@fontsource/geist-mono` 5: fontes do mockup servidas localmente, sem depender de CDN.
 - ESLint 10, `@eslint/js`, `typescript-eslint`, `eslint-plugin-react-hooks`, `eslint-plugin-react-refresh` e `globals`: análise de TypeScript/React, regras de hooks e compatibilidade com Fast Refresh.
+- `@stylistic/eslint-plugin` 5: exige separação visual entre imports e declarações, funções, tipos, membros de classe e blocos de execução; complementa o Prettier, que preserva linhas em branco, mas não cria todas essas separações.
 - Prettier 3: formatação consistente, com comandos separados para verificar e modificar.
 - Vitest 4: testes executados uma vez, sem modo de observação.
 - Testing Library React, Jest DOM e User Event: testar componentes pelos rótulos, papéis acessíveis e interações reais de usuário.
@@ -93,7 +94,9 @@ npm run build
 npm audit
 ```
 
-`npm test` usa `vitest run`: termina sozinho, sem observar arquivos. Há testes de tabela, filtros, paginação pela API, carregamento/vazio/erro, moedas, mensagens de recusa e navegação. Os pedidos são simulados; testes não criam nem apagam dados no banco da aplicação. `npm run format:check` não altera arquivos. Para formatar intencionalmente, use `npm run format`.
+`npm test` usa `vitest run`: termina sozinho, sem observar arquivos. Há testes de tabela, filtros, paginação pela API, carregamento/vazio/erro, moedas, mensagens de recusa e navegação. Os pedidos são simulados; testes não criam nem apagam dados no banco da aplicação.
+
+`npm run format:check` executa ESLint e Prettier sem alterar arquivos, incluindo a checagem de linhas em branco. Para corrigir intencionalmente, `npm run format` aplica as correções automáticas do ESLint e depois o Prettier. A configuração usa dois espaços e finais de linha LF; `.editorconfig` orienta editores compatíveis e `.gitattributes` mantém LF também no checkout do Git, inclusive no Windows. Os testes de tooling verificam que o lint rejeita código sem as separações e que a correção é estável com o Prettier. Nos estilos, os blocos de seletores também ficam separados por uma linha em branco.
 
 ## Decisões e premissas
 

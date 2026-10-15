@@ -4,6 +4,7 @@ import { useOverview } from '../../features/overview/overview.queries';
 import { Icon } from './Icon';
 import { Logo } from './Logo';
 import { Message } from './Message';
+
 export function AppShell({
   children,
   onRefresh,
@@ -16,6 +17,7 @@ export function AppShell({
   const [collapsed, setCollapsed] = useState(false);
   const overview = useOverview();
   const data = overview.data;
+
   return (
     <div className={`app-shell ${collapsed ? 'sidebar-collapsed' : ''}`}>
       {!collapsed && (

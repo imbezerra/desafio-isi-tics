@@ -1,5 +1,6 @@
 import { apiGet } from '../../shared/api/client';
 import type { PlayerList } from '../../shared/api/contracts';
+
 export interface PlayerFilters {
   search: string;
   position: string;
@@ -12,6 +13,7 @@ export interface PlayerFilters {
   maxValue: string;
   sort: string;
 }
+
 export const initialFilters: PlayerFilters = {
   search: '',
   position: '',
@@ -24,6 +26,7 @@ export const initialFilters: PlayerFilters = {
   maxValue: '',
   sort: 'name',
 };
+
 export function buildPlayersQuery(filters: PlayerFilters, page: number) {
   const query = new URLSearchParams({ page: String(page), limit: '10', sort: filters.sort });
   const values = {
@@ -37,9 +40,12 @@ export function buildPlayersQuery(filters: PlayerFilters, page: number) {
     min_value: filters.minValue,
     max_value: filters.maxValue,
   };
+
   for (const [key, value] of Object.entries(values)) if (value !== '') query.set(key, value);
+
   return query.toString();
 }
+
 export function getPlayers(filters: PlayerFilters, page: number, signal: AbortSignal) {
   return apiGet<PlayerList>(`/players?${buildPlayersQuery(filters, page)}`, signal);
 }

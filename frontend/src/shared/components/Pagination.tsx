@@ -1,4 +1,5 @@
 import { Icon } from './Icon';
+
 export function Pagination({
   page,
   totalPages,
@@ -16,6 +17,7 @@ export function Pagination({
 }) {
   const first = totalItems === 0 ? 0 : (page - 1) * limit + 1;
   const last = Math.min(page * limit, totalItems);
+
   return (
     <footer className="pagination">
       <span aria-live="polite">

@@ -7,5 +7,6 @@ describe('Apresentação em português do Brasil', () => {
     expect(formatMoney(0)).toBe('0,00');
     expect(formatMoney(37)).toBe('37,00');
   });
+
   it('mostra as iniciais do nome', () => expect(getInitials('  João Silva ')).toBe('JS'));
 });

@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+
 export function Logo({ large = false }: { large?: boolean }) {
   return (
     <Link to="/" className={`logo ${large ? 'logo-large' : ''}`} aria-label="Passe, página inicial">

@@ -13,18 +13,21 @@ describe('Tela inicial e navegação sem recarga', () => {
     expect(screen.getByText('Sua liga começa aqui', { exact: false })).toBeInTheDocument();
     expect(screen.queryByText('Delta FC')).not.toBeInTheDocument();
   });
+
   it('navega pelo botão Iniciar para a listagem', async () => {
     mockApi();
     renderApp();
     await userEvent.click(screen.getByRole('link', { name: 'Iniciar' }));
     expect(await screen.findByText('João Silva')).toBeInTheDocument();
   });
+
   it('navega pelo atalho Enter fora de campos interativos', async () => {
     mockApi();
     renderApp();
     await userEvent.keyboard('{Enter}');
     expect(await screen.findByText('João Silva')).toBeInTheDocument();
   });
+
   it('trata caminhos inexistentes', () => {
     renderApp('/pagina-inexistente');
     expect(screen.getByRole('heading', { name: 'Página não encontrada' })).toBeInTheDocument();

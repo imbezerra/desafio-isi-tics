@@ -15,22 +15,27 @@ const defaults = {
   onRetry: vi.fn(),
   emptyMessage: 'Nenhum jogador encontrado.',
 };
+
 describe('Tabela reutilizável', () => {
   it('mostra carregamento', () => {
     render(<DataTable {...defaults} loading />);
     expect(screen.getByRole('status')).toHaveTextContent('Carregando jogadores');
   });
+
   it('mostra lista vazia', () => {
     render(<DataTable {...defaults} />);
     expect(screen.getByRole('status')).toHaveTextContent('Nenhum jogador encontrado.');
   });
+
   it('mostra mensagem da API e permite tentar novamente', async () => {
     const onRetry = vi.fn();
+
     render(<DataTable {...defaults} error="Clube não encontrado." onRetry={onRetry} />);
     expect(screen.getByRole('alert')).toHaveTextContent('Clube não encontrado.');
     await userEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }));
     expect(onRetry).toHaveBeenCalledOnce();
   });
+
   it('renderiza tabela sem alterar a ordem recebida', () => {
     render(
       <DataTable
@@ -41,7 +46,9 @@ describe('Tabela reutilizável', () => {
         ]}
       />,
     );
+
     const rows = screen.getAllByRole('row');
+
     expect(rows[1]).toHaveTextContent('Zeca');
     expect(rows[2]).toHaveTextContent('Ana');
   });

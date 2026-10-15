@@ -6,6 +6,7 @@ export function mockApi(
 ) {
   const mock = vi.fn(async (input: RequestInfo | URL) => {
     const url = new URL(String(input));
+
     switch (url.pathname) {
       case '/api/v1/players':
         return resolvePlayers(url);
@@ -19,6 +20,8 @@ export function mockApi(
         throw new Error(`Endpoint inesperado no teste: ${url}`);
     }
   });
+
   vi.stubGlobal('fetch', mock);
+
   return mock;
 }

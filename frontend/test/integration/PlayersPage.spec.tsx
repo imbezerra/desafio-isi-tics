@@ -10,6 +10,7 @@ describe('Listagem integrada à camada HTTP', () => {
     mockApi();
     renderApp('/players');
     expect(await screen.findByText('João Silva')).toBeInTheDocument();
+
     for (const label of [
       'Jogador',
       'Posição',
@@ -26,6 +27,7 @@ describe('Listagem integrada à camada HTTP', () => {
     expect(screen.getByText('37,62')).toBeInTheDocument();
     expect(screen.getByText('Livre')).toBeInTheDocument();
   });
+
   it('consulta a segunda página e volta à primeira ao aplicar filtros', async () => {
     const user = userEvent.setup();
     const fetchMock = mockApi((url) =>
@@ -42,6 +44,7 @@ describe('Listagem integrada à camada HTTP', () => {
         ),
       ),
     );
+
     renderApp('/players');
     await screen.findByText('João Silva');
     await user.click(screen.getByRole('button', { name: 'Próxima' }));
@@ -52,6 +55,7 @@ describe('Listagem integrada à camada HTTP', () => {
       expect(
         fetchMock.mock.calls.some(([input]) => {
           const url = new URL(String(input));
+
           return (
             url.searchParams.get('search') === 'João' &&
             url.searchParams.get('page') === '1' &&
@@ -61,11 +65,13 @@ describe('Listagem integrada à camada HTTP', () => {
       ).toBe(true),
     );
   });
+
   it('exibe o clube identificado pela API', async () => {
     mockApi(() => Response.json(playerList([{ ...player, club_id: 7 }])));
     renderApp('/players');
     expect(await screen.findByText('AGU · Águias FC')).toBeInTheDocument();
   });
+
   it('mostra lista vazia e bloqueia a próxima página', async () => {
     mockApi(() => Response.json(playerList([])));
     renderApp('/players');
@@ -73,17 +79,21 @@ describe('Listagem integrada à camada HTTP', () => {
     expect(screen.getByRole('button', { name: 'Próxima' })).toBeDisabled();
     expect(screen.getByText('Mostrando 0–0 de 0 jogadores')).toBeInTheDocument();
   });
+
   it('mostra carregamento enquanto o pedido está pendente', async () => {
     mockApi();
     const fetchMock = vi.mocked(fetch);
+
     fetchMock.mockImplementation(() => new Promise<Response>(() => {}));
     renderApp('/players');
     expect(screen.getByText('Carregando jogadores…')).toBeInTheDocument();
   });
+
   it('preserva a mensagem de recusa sem substituí-la por erro genérico', async () => {
     mockApi(() =>
       Response.json({ message: 'Combinação contraditória de filtros.' }, { status: 400 }),
     );
+
     renderApp('/players');
     expect(
       (await screen.findAllByRole('alert')).some((element) =>

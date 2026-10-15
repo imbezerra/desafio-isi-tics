@@ -12,6 +12,7 @@ import { usePlayers } from './players.queries';
 import { initialFilters, type PlayerFilters } from './players.api';
 import { PlayerFiltersForm } from './PlayerFiltersForm';
 import './players.css';
+
 const positions = {
   GOL: 'Goleiro',
   ZAG: 'Zagueiro',
@@ -24,6 +25,7 @@ const conditions = {
   MAL_CONDICIONADO: { label: 'Mal condicionado', className: 'unfit', icon: 'condition-unfit' },
   DOENTE: { label: 'Doente', className: 'sick', icon: 'condition-sick' },
 };
+
 function createColumns(clubs: Club[]): Column<Player>[] {
   return [
     {
@@ -72,6 +74,7 @@ function createColumns(clubs: Club[]): Column<Player>[] {
       label: 'Condição',
       render: (player) => {
         const condition = conditions[player.condition];
+
         return (
           <span className={`condition-badge ${condition.className}`}>
             <Icon name={condition.icon} />
@@ -97,6 +100,7 @@ function createColumns(clubs: Club[]): Column<Player>[] {
       label: 'Clube',
       render: (player) => {
         const club = clubs.find((item) => item.id === player.club_id);
+
         return player.club_id === null ? (
           <span className="free-badge">Livre</span>
         ) : club ? (
@@ -110,16 +114,19 @@ function createColumns(clubs: Club[]): Column<Player>[] {
     },
   ];
 }
+
 export function PlayersPage() {
   const [filters, setFilters] = useState(initialFilters);
   const [page, setPage] = useState(1);
   const players = usePlayers(filters, page);
   const clubs = useClubs();
   const queryClient = useQueryClient();
+
   function applyFilters(next: PlayerFilters) {
     setFilters(next);
     setPage(1);
   }
+
   return (
     <AppShell
       refreshing={players.isFetching || clubs.isFetching}

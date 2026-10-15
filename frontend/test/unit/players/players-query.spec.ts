@@ -4,8 +4,10 @@ import { buildPlayersQuery, initialFilters } from '../../../src/features/players
 describe('Consulta de jogadores', () => {
   it('envia paginação de dez itens e ordenação para a API', () => {
     const params = new URLSearchParams(buildPlayersQuery(initialFilters, 2));
+
     expect(Object.fromEntries(params)).toEqual({ page: '2', limit: '10', sort: 'name' });
   });
+
   it('envia filtros combinados com os nomes obrigatórios do contrato', () => {
     const params = new URLSearchParams(
       buildPlayersQuery(
@@ -24,6 +26,7 @@ describe('Consulta de jogadores', () => {
         1,
       ),
     );
+
     expect(Object.fromEntries(params)).toEqual({
       page: '1',
       limit: '10',
@@ -38,6 +41,7 @@ describe('Consulta de jogadores', () => {
       sort: 'value_desc',
     });
   });
+
   it.each(['true', 'false'])('não perde o filtro free=%s', (free) => {
     expect(new URLSearchParams(buildPlayersQuery({ ...initialFilters, free }, 1)).get('free')).toBe(
       free,

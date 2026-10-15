@@ -3,6 +3,7 @@ import type { Club } from '../../shared/api/contracts';
 import { Field } from '../../shared/components/Field';
 import { Icon } from '../../shared/components/Icon';
 import { initialFilters, type PlayerFilters } from './players.api';
+
 const sortOptions = [
   ['name', 'Nome'],
   ['value_asc', 'Valor de mercado: menor primeiro'],
@@ -11,6 +12,7 @@ const sortOptions = [
   ['age_desc', 'Idade: maior primeiro'],
   ['position', 'Posição'],
 ];
+
 export function PlayerFiltersForm({
   clubs,
   onApply,
@@ -19,6 +21,7 @@ export function PlayerFiltersForm({
   onApply: (filters: PlayerFilters) => void;
 }) {
   const [filters, setFilters] = useState(initialFilters);
+
   function update(key: keyof PlayerFilters, value: string) {
     setFilters((current) => ({
       ...current,
@@ -26,10 +29,12 @@ export function PlayerFiltersForm({
       ...(key === 'free' && value === 'true' ? { clubId: '' } : {}),
     }));
   }
+
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     onApply(filters);
   }
+
   return (
     <form className="filters" onSubmit={submit} aria-label="Filtros de jogadores">
       <div className="filters-main">

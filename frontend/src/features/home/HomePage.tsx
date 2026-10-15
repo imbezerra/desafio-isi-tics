@@ -5,6 +5,7 @@ import { Icon } from '../../shared/components/Icon';
 import { Logo } from '../../shared/components/Logo';
 import { Message } from '../../shared/components/Message';
 import './home.css';
+
 const steps = [
   {
     title: 'Jogadores',
@@ -33,9 +34,11 @@ const steps = [
     text: 'Escale 5 titulares e jogue partidas que entram na classificação.',
   },
 ];
+
 export function HomePage() {
   const overview = useOverview();
   const navigate = useNavigate();
+
   useEffect(() => {
     function handleKey(event: KeyboardEvent) {
       if (event.key === 'Enter' && event.target === document.body && !event.repeat) {
@@ -43,10 +46,14 @@ export function HomePage() {
         void navigate('/players');
       }
     }
+
     window.addEventListener('keydown', handleKey);
+
     return () => window.removeEventListener('keydown', handleKey);
   }, [navigate]);
+
   const data = overview.data;
+
   return (
     <main id="main-content" className="home-page">
       <div className="home-stage">
