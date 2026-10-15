@@ -52,8 +52,12 @@ npm run build
 
 ## Funcionalidades não implementadas
 
-Esta etapa prepara a base. Cliente HTTP, componentes compartilhados, tela inicial, consulta de jogadores e Docker serão adicionados nos commits seguintes.
+Esta etapa prepara a base. Cliente HTTP, contratos, consultas do resumo da liga, estrutura lateral e componentes compartilhados estão disponíveis. Tela inicial, consulta de jogadores e Docker serão adicionados nos commits seguintes.
 
 ## Uso de inteligência artificial
 
 Será preenchido posteriormente
+
+## Camada de consultas e componentes compartilhados
+
+src/shared/api concentra fetch, contratos e mensagens de falha. src/features/overview consulta a API por hooks de dados. src/shared/components fornece tabela, paginação, campos, mensagens, marca e estrutura lateral. src/shared/formatters limita-se à apresentação em pt-BR. src/styles/global.css e os SVGs locais mantêm o visual compartilhado. Os testes verificam HTTP, cancelamento, mensagens, formatação e estados da tabela.

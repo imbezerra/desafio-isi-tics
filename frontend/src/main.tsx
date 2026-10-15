@@ -7,6 +7,7 @@ import '@fontsource/geist/latin-500.css';
 import '@fontsource/geist/latin-600.css';
 import '@fontsource/geist-mono/latin-400.css';
 import './styles/tokens.css';
+import './styles/global.css';
 import { App } from './app/App';
 import { queryClient } from './app/query-client';
 
