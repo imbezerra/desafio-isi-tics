@@ -10,6 +10,17 @@ import { mockPlayerApi } from '../helpers/mock-player-api';
 
 import { renderApp } from '../helpers/render-app';
 
+async function openAction(
+  user: ReturnType<typeof userEvent.setup>,
+  label: string,
+  name = player.name,
+) {
+  await user.click(await screen.findByRole('button', { name: `Ações de ${name}` }));
+  await user.click(screen.getByRole('menuitem', { name: label }));
+
+  return screen.findByRole('dialog');
+}
+
 async function fillCreate(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('button', { name: 'Novo jogador' }));
   const dialog = screen.getByRole('dialog');
@@ -36,7 +47,19 @@ async function fillCreate(user: ReturnType<typeof userEvent.setup>) {
   return dialog;
 }
 
-const flows = [{ kind: 'create', method: 'POST', label: 'Salvar jogador', menu: '' }] as const;
+const flows = [
+  { kind: 'create', method: 'POST', label: 'Salvar jogador', menu: '' },
+  { kind: 'edit', method: 'PUT', label: 'Salvar alterações', menu: 'Editar' },
+] as const;
+
+async function prepareFlow(user: ReturnType<typeof userEvent.setup>, flow: (typeof flows)[number]) {
+  if (flow.kind === 'create') return fillCreate(user);
+
+  await openAction(user, flow.menu);
+  const button = await screen.findByRole('button', { name: flow.label });
+
+  return button.closest('dialog')!;
+}
 
 describe('Cadastro de jogadores', () => {
   it('mostra erros junto aos onze campos sem enviar a API', async () => {
@@ -110,6 +133,80 @@ describe('Cadastro de jogadores', () => {
   });
 });
 
+describe('Detalhes e edição', () => {
+  it('carrega o jogador por id, mostra os sete indicadores e permite abrir edição', async () => {
+    const api = mockPlayerApi();
+    const user = userEvent.setup();
+
+    renderApp('/players');
+    await openAction(user, 'Ver detalhes');
+    const dialog = await screen.findByRole('dialog', { name: 'Detalhes do jogador' });
+
+    expect(within(dialog).getAllByRole('meter')).toHaveLength(7);
+    expect(within(dialog).getByRole('meter', { name: 'Potencial' })).toHaveAttribute('value', '85');
+    expect(api.mock.mock.calls.some(([url]) => String(url).endsWith('/players/1'))).toBe(true);
+    await user.click(within(dialog).getByRole('button', { name: 'Editar' }));
+    expect(await screen.findByRole('textbox', { name: 'Nome' })).toHaveValue(player.name);
+  });
+
+  it('envia apenas nome, posição, idade e agilidade, atualizando a lista', async () => {
+    const api = mockPlayerApi();
+    const user = userEvent.setup();
+
+    renderApp('/players');
+    await openAction(user, 'Editar');
+    const name = await screen.findByRole('textbox', { name: 'Nome' });
+
+    await user.clear(name);
+    await user.type(name, 'João Santos');
+    expect(screen.queryByRole('spinbutton', { name: 'Potencial' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Salvar alterações' }));
+    await screen.findByText('João Santos atualizado com sucesso.');
+    expect(within(screen.getByRole('table')).getByText('João Santos')).toBeInTheDocument();
+    expect(JSON.parse(String(api.writes('PUT')[0][1]?.body))).toEqual({
+      name: 'João Santos',
+      position: 'MEI',
+      age: 20,
+      agility: 85,
+    });
+  });
+
+  it('não permite mudar posição de jogador com clube e não oferece excluir', async () => {
+    mockPlayerApi({ initial: [{ ...player, club_id: 7 }] });
+    const user = userEvent.setup();
+
+    renderApp('/players');
+    await user.click(await screen.findByRole('button', { name: `Ações de ${player.name}` }));
+    expect(screen.queryByRole('menuitem', { name: 'Excluir' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('menuitem', { name: 'Editar' }));
+    expect(await screen.findByRole('radio', { name: /GOL/ })).toBeDisabled();
+    expect(screen.getByRole('radio', { name: /MEI/ })).toBeEnabled();
+  });
+
+  it('expõe erro de carregamento dos detalhes e permite tentar novamente', async () => {
+    let failed = true;
+
+    mockPlayerApi({
+      detail: () =>
+        failed
+          ? Response.json({ message: 'Falha temporária.' }, { status: 500 })
+          : Response.json(player),
+    });
+
+    const user = userEvent.setup();
+
+    renderApp('/players');
+    await openAction(user, 'Ver detalhes');
+    expect(await screen.findByRole('alert')).toHaveTextContent('Falha temporária.');
+    failed = false;
+    await user.click(
+      within(screen.getByRole('dialog')).getByRole('button', { name: 'Tentar novamente' }),
+    );
+
+    expect(await screen.findByRole('dialog', { name: 'Detalhes do jogador' })).toBeInTheDocument();
+  });
+});
+
 describe.each(flows)('Proteção de envio e recusas: $kind', (flow) => {
   it('envia um único pedido no clique duplo e bloqueia fechar enquanto pendente', async () => {
     let release!: (response: Response) => void;
@@ -122,7 +219,7 @@ describe.each(flows)('Proteção de envio e recusas: $kind', (flow) => {
     const user = userEvent.setup();
 
     renderApp('/players');
-    const dialog = await fillCreate(user);
+    const dialog = await prepareFlow(user, flow);
 
     await user.dblClick(screen.getByRole('button', { name: flow.label }));
     expect(api.writes(flow.method)).toHaveLength(1);
@@ -143,7 +240,7 @@ describe.each(flows)('Proteção de envio e recusas: $kind', (flow) => {
     const user = userEvent.setup();
 
     renderApp('/players');
-    await fillCreate(user);
+    await prepareFlow(user, flow);
     await user.click(screen.getByRole('button', { name: flow.label }));
     expect(await screen.findByRole('alert')).toHaveTextContent(`Recusa específica ${status}.`);
     expect(screen.getByRole('dialog')).toBeInTheDocument();

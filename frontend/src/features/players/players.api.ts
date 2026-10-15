@@ -9,8 +9,16 @@ export type CreatePlayerInput = EditPlayerInput &
     'pace' | 'shooting' | 'passing' | 'dribbling' | 'defending' | 'physical' | 'potential'
   >;
 
+export function getPlayer(id: number, signal: AbortSignal) {
+  return apiGet<Player>(`/players/${id}`, signal);
+}
+
 export function createPlayer(input: CreatePlayerInput) {
   return apiWrite<Player>('POST', '/players', input);
+}
+
+export function editPlayer(id: number, input: EditPlayerInput) {
+  return apiWrite<Player>('PUT', `/players/${id}`, input);
 }
 
 export interface PlayerFilters {

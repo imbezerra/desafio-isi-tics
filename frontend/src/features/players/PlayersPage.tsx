@@ -12,12 +12,17 @@ import { usePlayers } from './players.queries';
 import { initialFilters, type PlayerFilters } from './players.api';
 import { PlayerFiltersForm } from './PlayerFiltersForm';
 import { conditions, positions } from './player-fields';
+import { PlayerActions, type PlayerAction } from './PlayerActions';
 import { PlayerForm } from './PlayerForm';
+import { PlayerDialog } from './PlayerDialog';
 import { PlayerResult } from './PlayerResult';
 import './players.css';
 import './player-dialogs.css';
 
-function createColumns(clubs: Club[]): Column<Player>[] {
+function createColumns(
+  clubs: Club[],
+  onSelect: (kind: PlayerAction, player: Player) => void,
+): Column<Player>[] {
   return [
     {
       key: 'name',
@@ -103,6 +108,13 @@ function createColumns(clubs: Club[]): Column<Player>[] {
         );
       },
     },
+    {
+      key: 'actions',
+      label: 'Ações',
+      render: (player) => (
+        <PlayerActions player={player} onSelect={(kind) => onSelect(kind, player)} />
+      ),
+    },
   ];
 }
 
@@ -112,13 +124,23 @@ export function PlayersPage() {
   const players = usePlayers(filters, page);
   const clubs = useClubs();
   const queryClient = useQueryClient();
-  const [selection, setSelection] = useState<{ kind: 'create' }>();
+  const [selection, setSelection] = useState<
+    { kind: PlayerAction; player: Player } | { kind: 'create' }
+  >();
   const [notice, setNotice] = useState<{ message: string; player?: Player }>();
 
+  function select(kind: PlayerAction, player: Player) {
+    setSelection({ kind, player });
+  }
+
   async function saved(player: Player) {
+    queryClient.setQueryData(['player', player.id], player);
     await queryClient.invalidateQueries();
     setNotice({
-      message: `${player.name} cadastrado com sucesso.`,
+      message:
+        selection?.kind === 'create'
+          ? `${player.name} cadastrado com sucesso.`
+          : `${player.name} atualizado com sucesso.`,
       player,
     });
 
@@ -186,7 +208,7 @@ export function PlayersPage() {
         </header>
         <DataTable
           label="Jogadores"
-          columns={createColumns(clubs.data ?? [])}
+          columns={createColumns(clubs.data ?? [], select)}
           rows={players.data?.data ?? []}
           getRowKey={(player) => player.id}
           loading={players.isPending}
@@ -210,6 +232,17 @@ export function PlayersPage() {
       </p>
       {selection?.kind === 'create' && (
         <PlayerForm onClose={() => setSelection(undefined)} onSaved={saved} />
+      )}
+      {selection && selection.kind !== 'create' && (
+        <PlayerDialog
+          key={`${selection.kind}-${selection.player.id}`}
+          id={selection.player.id}
+          kind={selection.kind}
+          clubs={clubs.data ?? []}
+          onClose={() => setSelection(undefined)}
+          onSelect={select}
+          onSaved={saved}
+        />
       )}
     </AppShell>
   );

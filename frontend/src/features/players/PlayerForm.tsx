@@ -6,12 +6,13 @@ import { Icon } from '../../shared/components/Icon';
 import { Message } from '../../shared/components/Message';
 import { Modal } from '../../shared/components/Modal';
 import { useAction } from '../../shared/hooks/useAction';
-import { createPlayer } from './players.api';
+import { createPlayer, editPlayer } from './players.api';
 import {
   initialPlayerValues,
   numericFields,
   positions,
   toCreatePlayerInput,
+  toEditPlayerInput,
   validatePlayerForm,
   type PlayerFormErrors,
   type PlayerFormValues,
@@ -19,17 +20,22 @@ import {
 import { PlayerIndicators } from './PlayerIndicators';
 
 export function PlayerForm({
+  player,
   onClose,
   onSaved,
 }: {
+  player?: Player;
   onClose: () => void;
   onSaved: (player: Player) => Promise<void>;
 }) {
-  const [values, setValues] = useState(() => initialPlayerValues());
+  const [values, setValues] = useState(() => initialPlayerValues(player));
   const [errors, setErrors] = useState<PlayerFormErrors>({});
   const formRef = useRef<HTMLFormElement>(null);
   const action = useAction(
-    (input: PlayerFormValues) => createPlayer(toCreatePlayerInput(input)),
+    (input: PlayerFormValues) =>
+      player
+        ? editPlayer(player.id, toEditPlayerInput(input))
+        : createPlayer(toCreatePlayerInput(input)),
     onSaved,
   );
 
@@ -40,7 +46,7 @@ export function PlayerForm({
 
   function submit(event: FormEvent) {
     event.preventDefault();
-    const nextErrors = validatePlayerForm(values, false);
+    const nextErrors = validatePlayerForm(values, !!player);
 
     setErrors(nextErrors);
 
@@ -86,9 +92,13 @@ export function PlayerForm({
 
   return (
     <Modal
-      title="Novo jogador"
-      description="Informe os dados e indicadores. O valor base e o overall serão calculados pela API."
-      variant="wide"
+      title={player ? 'Editar jogador' : 'Novo jogador'}
+      description={
+        player
+          ? 'Edite nome, posição, idade e agilidade. Os demais dados não mudam.'
+          : 'Informe os dados e indicadores. O valor base e o overall serão calculados pela API.'
+      }
+      variant={player ? 'default' : 'wide'}
       busy={action.pending}
       onClose={onClose}
     >
@@ -132,7 +142,7 @@ export function PlayerForm({
                     onChange={() => update('position', code)}
                     required
                     aria-invalid={!!errors.position}
-                    disabled={action.pending}
+                    disabled={action.pending || (!!player?.club_id && code !== player.position)}
                   />
                   <strong>{code}</strong>
                   <small>{label}</small>
@@ -144,41 +154,57 @@ export function PlayerForm({
                 {errors.position}
               </small>
             )}
+            {player?.club_id && (
+              <small className="muted">Jogador com clube não pode mudar de posição.</small>
+            )}
           </fieldset>
           <div className="player-basic-fields">
             {numericFields.slice(0, 2).map(numberField)}
-            <Field id="player-base" label="Valor base">
-              <div className="input-icon">
-                <Icon name="field-lock" />
-                <input id="player-base" disabled value="Após salvar" />
-              </div>
-            </Field>
+            {!player && (
+              <Field id="player-base" label="Valor base">
+                <div className="input-icon">
+                  <Icon name="field-lock" />
+                  <input id="player-base" disabled value="Após salvar" />
+                </div>
+              </Field>
+            )}
           </div>
-          <section className="player-technical-fields">
-            <h3>Indicadores técnicos</h3>
-            <p className="muted">
-              Informe os sete indicadores. A API valida também a soma e a relação com o potencial e
-              a idade.
+          {player ? (
+            <p className="immutable-note">
+              <Icon name="field-lock" />
+              Indicadores técnicos, potencial e valor base não podem ser editados.
             </p>
-            <div className="technical-layout">
-              <div className="indicator-fields">
-                {numericFields.slice(2).map(numberField)}
-                <Field id="player-overall" label="Overall">
-                  <div className="input-icon">
-                    <Icon name="field-lock" />
-                    <input id="player-overall" disabled value="Após salvar" />
-                  </div>
-                </Field>
+          ) : (
+            <section className="player-technical-fields">
+              <h3>Indicadores técnicos</h3>
+              <p className="muted">
+                Informe os sete indicadores. A API valida também a soma e a relação com o potencial
+                e a idade.
+              </p>
+              <div className="technical-layout">
+                <div className="indicator-fields">
+                  {numericFields.slice(2).map(numberField)}
+                  <Field id="player-overall" label="Overall">
+                    <div className="input-icon">
+                      <Icon name="field-lock" />
+                      <input id="player-overall" disabled value="Após salvar" />
+                    </div>
+                  </Field>
+                </div>
+                <PlayerIndicators values={preview} />
               </div>
-              <PlayerIndicators values={preview} />
-            </div>
-            <p className="page-note">
-              <Icon name="dialog-info" />O jogador começa livre e Apto.
-            </p>
-          </section>
+              <p className="page-note">
+                <Icon name="dialog-info" />O jogador começa livre e Apto.
+              </p>
+            </section>
+          )}
         </fieldset>
         {action.error && <Message tone="error">{action.error}</Message>}
-        <FormActions pending={action.pending} onCancel={onClose} label="Salvar jogador" />
+        <FormActions
+          pending={action.pending}
+          onCancel={onClose}
+          label={player ? 'Salvar alterações' : 'Salvar jogador'}
+        />
       </form>
     </Modal>
   );
