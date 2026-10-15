@@ -1,4 +1,5 @@
 import { Link, Route, Routes } from 'react-router';
+import { HomePage } from '../features/home/HomePage';
 
 export function App() {
   return (
@@ -7,12 +8,14 @@ export function App() {
         Pular para o conteúdo
       </a>
       <Routes>
+        <Route path="/" element={<HomePage />} />
         <Route
-          path="/"
+          path="/players"
           element={
-            <main id="main-content">
-              <h1>Passe</h1>
-              <p>Base da interface preparada para as próximas etapas.</p>
+            <main id="main-content" className="not-found">
+              <h1>Jogadores</h1>
+              <p>A consulta de jogadores será disponibilizada na próxima etapa.</p>
+              <Link to="/">Voltar ao início</Link>
             </main>
           }
         />
