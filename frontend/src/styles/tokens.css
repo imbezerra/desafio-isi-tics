@@ -1,0 +1,21 @@
+:root {
+  font-family: 'Geist', sans-serif;
+  color: #09090b;
+  background: #fff;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --background: #fff;
+  --foreground: #09090b;
+  --muted: #f4f4f5;
+  --muted-foreground: #686872;
+  --border: #e4e4e7;
+  --input-border: #a1a1aa;
+  --primary: #155dfc;
+  --primary-soft: #eff6ff;
+  --sidebar: #fafafa;
+  --success: #00813a;
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 5%);
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 10%);
+  --radius: 10px;
+}
