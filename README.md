@@ -52,10 +52,10 @@ Para executar a API fora do Docker e rodar verificações, consulte [backend/REA
 
 - `backend/src/common/`: tipos, cálculos, normalização de texto, parsers e tratamento central de erros.
 - `backend/src/database/`: conexão Prisma.
-- `backend/src/jogadores/`: módulo separado em controllers, DTOs, pipes, services, repositories, domínio, presenters e Swagger.
-- `backend/src/clubes/`: módulo de cadastro e consulta de clubes, com a mesma separação em camadas.
-- `backend/src/mercado/`: compra e venda de jogadores, contratos, taxas, multas, comissões, transações atômicas, histórico filtrado com totais e exportação CSV.
-- `backend/src/liga/`: escalações, partidas com seis duelos históricos e classificação calculada.
+- `backend/src/players/`: módulo separado em controllers, DTOs, pipes, services, repositories, domínio, presenters e Swagger.
+- `backend/src/clubs/`: módulo de cadastro e consulta de clubes, com a mesma separação em camadas.
+- `backend/src/market/`: compra e venda de jogadores, contratos, taxas, multas, comissões, transações atômicas, histórico filtrado com totais e exportação CSV.
+- `backend/src/league/`: escalações, partidas com seis duelos históricos e classificação calculada.
 - `backend/test/unit/`: testes unitários organizados por área, espelhando os diretórios de `src/`.
 - `backend/test/integration/`: testes de integração HTTP organizados por módulo, com PostgreSQL exclusivo.
 - `backend/prisma/`: modelo de dados e migrations versionadas das sete tabelas obrigatórias.
@@ -68,7 +68,7 @@ As bibliotecas e os motivos de uso estão descritos no README do backend.
 
 - As regras monetárias usam precisão decimal e arredondamento somente no resultado final de cada cálculo.
 - O banco mantém os nomes em português exigidos; as respostas HTTP usam os nomes em inglês e snake_case do contrato.
-- Identificadores internos adotam português em camelCase. Estruturas que espelham os campos obrigatórios da API preservam os nomes em inglês; os pipes convertem aliases internos e os presenters montam as respostas, sem alterar o contrato HTTP.
+- Identificadores, classes, arquivos e pastas do backend adotam inglês, com camelCase para funções/variáveis e PascalCase para tipos/classes. Os aliases do Prisma usam inglês com `@map`/`@@map`, preservando as tabelas e colunas em português exigidas pelo enunciado. Campos públicos e valores de lista da API permanecem exatamente como definidos; mensagens, documentação e commits continuam em português.
 - Arquitetura em camadas com Repository: controllers delegam ao serviço, serviços coordenam regras e transações, e repositories concentram o Prisma. Funções de domínio validam regras; pipes validam os formatos sem converter textos em números nos corpos JSON. A explicação de cada camada está no README do backend.
 - A exclusão de jogador é lógica. Registros históricos não são apagados.
 - Na listagem, o PostgreSQL aplica filtros persistidos. Busca Unicode, filtro de mercado e ordenação são feitos na API antes de paginar, reutilizando o cálculo central de mercado. Essa escolha evita duplicar a fórmula em SQL, mas consome memória proporcional aos jogadores candidatos. Para volumes elevados, essa etapa precisará migrar para consultas especializadas no banco.

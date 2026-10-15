@@ -1,10 +1,10 @@
-export const POSICOES = ['GOL', 'ZAG', 'LAT', 'MEI', 'ATA'] as const;
-export type Posicao = (typeof POSICOES)[number];
+export const PLAYER_POSITIONS = ['GOL', 'ZAG', 'LAT', 'MEI', 'ATA'] as const;
+export type PlayerPosition = (typeof PLAYER_POSITIONS)[number];
 
-export const CONDICOES = ['APTO', 'MAL_CONDICIONADO', 'DOENTE'] as const;
-export type Condicao = (typeof CONDICOES)[number];
+export const PLAYER_CONDITIONS = ['APTO', 'MAL_CONDICIONADO', 'DOENTE'] as const;
+export type PlayerCondition = (typeof PLAYER_CONDITIONS)[number];
 
-export type AtributosJogador = {
+export type PlayerAttributes = {
   pace: number;
   shooting: number;
   passing: number;

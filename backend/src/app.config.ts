@@ -2,18 +2,18 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { json, NextFunction, Request, Response } from 'express';
 
 import { HttpExceptionFilter } from './common/errors/http-exception.filter';
-import { criarRegistroHttp } from './common/logging/http-logging.middleware';
+import { createHttpLogger } from './common/logging/http-logging.middleware';
 
-export function configurarApi(app: INestApplication): void {
-  app.use(criarRegistroHttp());
-  const lerJson = json();
-  app.use((pedido: Request, resposta: Response, proximo: NextFunction) => {
-    const vendaSemCorpo =
-      pedido.method === 'POST' && /^\/api\/v1\/players\/[^/]+\/sell\/?$/.test(pedido.path);
-    if (['POST', 'PUT', 'PATCH'].includes(pedido.method) && !vendaSemCorpo) {
-      lerJson(pedido, resposta, proximo);
+export function configureApi(app: INestApplication): void {
+  app.use(createHttpLogger());
+  const parseJson = json();
+  app.use((request: Request, response: Response, next: NextFunction) => {
+    const bodylessSale =
+      request.method === 'POST' && /^\/api\/v1\/players\/[^/]+\/sell\/?$/.test(request.path);
+    if (['POST', 'PUT', 'PATCH'].includes(request.method) && !bodylessSale) {
+      parseJson(request, response, next);
     } else {
-      proximo();
+      next();
     }
   });
   app.enableCors({

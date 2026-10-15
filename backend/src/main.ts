@@ -2,11 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
-import { configurarApi } from './app.config';
+import { configureApi } from './app.config';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, { bodyParser: false });
-  configurarApi(app);
+  configureApi(app);
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Liga de Futebol')

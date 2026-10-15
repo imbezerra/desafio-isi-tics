@@ -1,27 +1,27 @@
 import { BadRequestException } from '@nestjs/common';
 
-const DATA_BRASIL_REGEX = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})-03:00$/;
+const BRASILIA_DATETIME_REGEX = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})-03:00$/;
 
-export function parseDataHoraBrasilia(valor: string): Date {
-  const correspondencia = DATA_BRASIL_REGEX.exec(valor);
+export function parseBrasiliaDateTime(value: string): Date {
+  const match = BRASILIA_DATETIME_REGEX.exec(value);
 
-  if (!correspondencia) {
+  if (!match) {
     throw new BadRequestException('Data e hora devem usar o formato AAAA-MM-DDTHH:MM-03:00.');
   }
 
-  const [, ano, mes, dia, hora, minuto] = correspondencia;
-  const data = new Date(`${ano}-${mes}-${dia}T${hora}:${minuto}:00-03:00`);
+  const [, year, month, day, hour, minute] = match;
+  const data = new Date(`${year}-${month}-${day}T${hour}:${minute}:00-03:00`);
 
-  const formatoEsperado = `${ano}-${mes}-${dia}T${hora}:${minuto}:00-03:00`;
-  if (Number.isNaN(data.getTime()) || formatarDataHoraBrasilia(data) !== formatoEsperado) {
+  const expectedFormat = `${year}-${month}-${day}T${hour}:${minute}:00-03:00`;
+  if (Number.isNaN(data.getTime()) || formatBrasiliaDateTime(data) !== expectedFormat) {
     throw new BadRequestException('Data ou hora inexistente.');
   }
 
   return data;
 }
 
-export function formatarDataHoraBrasilia(data: Date): string {
-  const partes = new Intl.DateTimeFormat('sv-SE', {
+export function formatBrasiliaDateTime(data: Date): string {
+  const parts = new Intl.DateTimeFormat('sv-SE', {
     timeZone: 'America/Sao_Paulo',
     year: 'numeric',
     month: '2-digit',
@@ -31,7 +31,7 @@ export function formatarDataHoraBrasilia(data: Date): string {
     second: '2-digit',
     hourCycle: 'h23',
   }).formatToParts(data);
-  const valores = Object.fromEntries(partes.map(({ type, value }) => [type, value]));
+  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
 
-  return `${valores.year}-${valores.month}-${valores.day}T${valores.hour}:${valores.minute}:${valores.second}-03:00`;
+  return `${values.year}-${values.month}-${values.day}T${values.hour}:${values.minute}:${values.second}-03:00`;
 }

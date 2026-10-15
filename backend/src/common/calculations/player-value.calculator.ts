@@ -1,10 +1,10 @@
 import Decimal from 'decimal.js';
 
-import { AtributosJogador, Condicao, Posicao } from '../domain.types';
+import { PlayerAttributes, PlayerCondition, PlayerPosition } from '../domain.types';
 
-import { arredondarMoeda, decimal, limitarMinimo } from './money.calculator';
+import { roundMoney, decimal, clampMinimum } from './money.calculator';
 
-const PESOS_POR_POSICAO: Record<Posicao, AtributosJogador> = {
+const POSITION_WEIGHTS: Record<PlayerPosition, PlayerAttributes> = {
   GOL: { pace: 10, shooting: 0, passing: 20, dribbling: 0, defending: 40, physical: 30 },
   ZAG: { pace: 10, shooting: 0, passing: 15, dribbling: 0, defending: 45, physical: 30 },
   LAT: { pace: 25, shooting: 0, passing: 20, dribbling: 15, defending: 25, physical: 15 },
@@ -12,64 +12,64 @@ const PESOS_POR_POSICAO: Record<Posicao, AtributosJogador> = {
   ATA: { pace: 20, shooting: 40, passing: 10, dribbling: 20, defending: 0, physical: 10 },
 };
 
-export function calcularOverall(posicao: Posicao, atributos: AtributosJogador): number {
-  const pesos = PESOS_POR_POSICAO[posicao];
-  const soma = (Object.keys(pesos) as (keyof AtributosJogador)[]).reduce(
-    (acumulado, atributo) => acumulado.plus(atributos[atributo] * pesos[atributo]),
+export function calculateOverall(position: PlayerPosition, attributes: PlayerAttributes): number {
+  const weights = POSITION_WEIGHTS[position];
+  const sum = (Object.keys(weights) as (keyof PlayerAttributes)[]).reduce(
+    (accumulator, attribute) => accumulator.plus(attributes[attribute] * weights[attribute]),
     new Decimal(0),
   );
 
-  return soma.dividedBy(100).toDecimalPlaces(0, Decimal.ROUND_HALF_UP).toNumber();
+  return sum.dividedBy(100).toDecimalPlaces(0, Decimal.ROUND_HALF_UP).toNumber();
 }
 
-export function calcularValorBase(
+export function calculateBaseValue(
   overall: number,
-  potencial: number,
-  idadeNoCadastro: number,
+  potential: number,
+  registrationAge: number,
 ): Decimal {
-  const primeiraFaixa = Math.max(0, Math.min(overall, 60) - 40);
-  const segundaFaixa = Math.max(0, Math.min(overall, 75) - 60);
-  const terceiraFaixa = Math.max(0, Math.min(overall, 99) - 75);
-  let valor = decimal(primeiraFaixa)
+  const firstBracket = Math.max(0, Math.min(overall, 60) - 40);
+  const secondBracket = Math.max(0, Math.min(overall, 75) - 60);
+  const thirdBracket = Math.max(0, Math.min(overall, 99) - 75);
+  let value = decimal(firstBracket)
     .times(0.5)
-    .plus(segundaFaixa * 2)
-    .plus(terceiraFaixa * 6);
+    .plus(secondBracket * 2)
+    .plus(thirdBracket * 6);
 
-  if (idadeNoCadastro <= 21) {
-    valor = valor.times(
+  if (registrationAge <= 21) {
+    value = value.times(
       decimal(100)
-        .plus(potencial - overall)
+        .plus(potential - overall)
         .dividedBy(100),
     );
   }
 
-  return limitarMinimo(arredondarMoeda(valor), 1);
+  return clampMinimum(roundMoney(value), 1);
 }
 
-export function calcularValorMercado(
-  valorBase: Decimal.Value,
-  condicao: Condicao,
-  agilidade: number,
-  idadeAtual: number,
+export function calculateMarketValue(
+  baseValue: Decimal.Value,
+  condition: PlayerCondition,
+  agility: number,
+  currentAge: number,
 ): Decimal {
-  const descontoCondicao = calcularDescontoCondicao(condicao, agilidade);
-  const ajusteIdade = idadeAtual <= 21 ? 10 : idadeAtual >= 32 ? -10 : 0;
-  const percentualTotal = Math.max(-40, ajusteIdade - descontoCondicao);
-  const valor = decimal(valorBase).times(decimal(100).plus(percentualTotal)).dividedBy(100);
+  const conditionDiscount = calculateConditionDiscount(condition, agility);
+  const ageAdjustment = currentAge <= 21 ? 10 : currentAge >= 32 ? -10 : 0;
+  const totalRate = Math.max(-40, ageAdjustment - conditionDiscount);
+  const value = decimal(baseValue).times(decimal(100).plus(totalRate)).dividedBy(100);
 
-  return limitarMinimo(arredondarMoeda(valor), 1);
+  return clampMinimum(roundMoney(value), 1);
 }
 
-function calcularDescontoCondicao(condicao: Condicao, agilidade: number): number {
-  const descontoBase = condicao === 'MAL_CONDICIONADO' ? 15 : condicao === 'DOENTE' ? 30 : 0;
+function calculateConditionDiscount(condition: PlayerCondition, agility: number): number {
+  const baseDiscount = condition === 'MAL_CONDICIONADO' ? 15 : condition === 'DOENTE' ? 30 : 0;
 
-  if (descontoBase === 0) {
+  if (baseDiscount === 0) {
     return 0;
   }
 
-  if (agilidade >= 80) {
-    return descontoBase / 2;
+  if (agility >= 80) {
+    return baseDiscount / 2;
   }
 
-  return agilidade <= 30 ? descontoBase + 10 : descontoBase;
+  return agility <= 30 ? baseDiscount + 10 : baseDiscount;
 }

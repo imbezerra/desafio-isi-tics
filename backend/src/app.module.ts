@@ -1,22 +1,22 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { ClubesModule } from './clubes/clubes.module';
+import { ClubsModule } from './clubs/clubs.module';
 import { PrismaModule } from './database/prisma.module';
 import { HealthModule } from './health/health.module';
-import { JogadoresModule } from './jogadores/jogadores.module';
-import { MercadoModule } from './mercado/mercado.module';
-import { LigaModule } from './liga/liga.module';
+import { PlayersModule } from './players/players.module';
+import { MarketModule } from './market/market.module';
+import { LeagueModule } from './league/league.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
     HealthModule,
-    JogadoresModule,
-    ClubesModule,
-    MercadoModule,
-    LigaModule,
+    PlayersModule,
+    ClubsModule,
+    MarketModule,
+    LeagueModule,
   ],
 })
 export class AppModule {}

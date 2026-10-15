@@ -55,13 +55,13 @@ npm run format:check
 npm test
 ```
 
-Os testes unitários ficam em `test/unit/`, organizados por área: `common/`, `jogadores/`, `clubes/`, `mercado/` e `liga/`. Essas áreas espelham os diretórios de `src/`; `tooling/` verifica a compatibilidade das ferramentas de teste. O Jest procura os arquivos `*.spec.ts` somente nessa pasta. O comando termina sozinho e inclui os exemplos de valor de mercado RN02–RN05.
+Os testes unitários ficam em `test/unit/`, organizados por área: `common/`, `players/`, `clubs/`, `market/` e `league/`. Essas áreas espelham os diretórios de `src/`; `tooling/` verifica a compatibilidade das ferramentas de teste. O Jest procura os arquivos `*.spec.ts` somente nessa pasta. O comando termina sozinho e inclui os exemplos de valor de mercado RN02–RN05.
 
 Os testes usam Jest 30, `@types/jest` 30 e `ts-jest` 29.4.14 ou superior na linha 29, que declara suporte ao Jest 30. A numeração principal do transformador não precisa ser igual à do executor. O [guia de migração do Jest](https://jestjs.io/docs/upgrading-to-jest30) orienta a revisão de tipos, matchers e configuração; o projeto mantém a separação entre testes unitários e de integração e a execução sem modo de observação.
 
 ## Testes de integração
 
-Os testes em `test/integration/` fazem requisições HTTP contra NestJS usando PostgreSQL real. Ficam separados por módulo, em `test/integration/jogadores/`, `test/integration/clubes/`, `test/integration/mercado/` e `test/integration/liga/`. Exigem um banco exclusivo terminado em `_test` e limpam suas tabelas a cada caso; nunca aponte para um banco com dados que você queira preservar.
+Os testes em `test/integration/` fazem requisições HTTP contra NestJS usando PostgreSQL real. Ficam separados por módulo, em `test/integration/players/`, `test/integration/clubs/`, `test/integration/market/` e `test/integration/league/`. Exigem um banco exclusivo terminado em `_test` e limpam suas tabelas a cada caso; nunca aponte para um banco com dados que você queira preservar.
 
 Na raiz, com o serviço `db` em execução, crie o banco de testes uma vez:
 
@@ -84,7 +84,7 @@ Histórico e CSV são verificados com o ciclo real de compra e venda: filtros co
 
 Os testes de escalação verificam as quatro formações, consulta vazia, ordenação, substituição, validações, preservação da escalação nas recusas e rollback em falha de gravação. Os elencos são formados por compras reais via API. Venda e alteração para DOENTE são testadas com escalação criada pelo endpoint, incluindo a ausência de retorno automático depois da recuperação.
 
-Partidas e classificação usam o exemplo da RN20 (Águias FC 1 × 2 Delta FC) como referência, compartilhado em `test/fixtures/liga.fixture.ts`. Os testes verificam os seis duelos, redução de condição e arredondamento, empate sem gol, preservação de dados após edição/venda/exclusão, formações históricas, filtros, ordem, efeitos sobre a classificação, ausência de efeitos em caixa/elenco e rollback caso um duelo falhe. Os testes unitários de classificação reproduzem também o exemplo de seis clubes e quatro partidas da RN21.
+Partidas e classificação usam o exemplo da RN20 (Águias FC 1 × 2 Delta FC) como referência, compartilhado em `test/fixtures/league.fixture.ts`. Os testes verificam os seis duelos, redução de condição e arredondamento, empate sem gol, preservação de dados após edição/venda/exclusão, formações históricas, filtros, ordem, efeitos sobre a classificação, ausência de efeitos em caixa/elenco e rollback caso um duelo falhe. Os testes unitários de classificação reproduzem também o exemplo de seis clubes e quatro partidas da RN21.
 
 ## Variáveis
 
@@ -119,7 +119,13 @@ Verificação: `npm audit --omit=dev` para a árvore de produção; `npm audit` 
 
 O backend usa arquitetura em camadas e o padrão Repository. O barema B2 exige separação entre controllers e regras/persistência, mas não exige um pattern específico. Essa estrutura também separa acesso ao banco dos serviços, para facilitar manutenção e testes.
 
-Dentro de `src/jogadores/`, `src/clubes/`, `src/mercado/` e `src/liga/`, cada pasta tem uma responsabilidade:
+### Convenção de nomes
+
+Classes, tipos, funções, variáveis, arquivos e pastas usam inglês. Tipos/classes seguem PascalCase; funções/variáveis, camelCase; arquivos, kebab-case. Por exemplo: `PlayersService`, `calculateMarketValue`, `homeClubId` e `player.dto.ts`. Valores obrigatórios como `APTO`, `COMPRA` e `MANDANTE` permanecem em português, conforme o contrato da API. Mensagens, descrições dos testes, documentação e commits também permanecem em português.
+
+O Prisma usa modelos e propriedades em inglês, como `Player.name`, mas `@@map` e `@map` preservam os nomes físicos exigidos, como `jogadores.nome`. Essa padronização não exige migration: a comparação entre os schemas antes e depois da refatoração não apresentou diferenças no SQL. Os oito testes de `test/unit/database/prisma-mapping.spec.ts` verificam as sete tabelas, suas colunas, as unicidades e a chave composta da escalação.
+
+Dentro de `src/players/`, `src/clubs/`, `src/market/` e `src/league/`, cada pasta tem uma responsabilidade:
 
 - `controllers/`: rotas, status HTTP e cabeçalhos. Recebe entradas validadas e chama o service.
 - `dto/`: tipos dos dados de cadastro, edição e consulta. Define contratos; os pipes validam esses contratos em execução.
@@ -129,25 +135,25 @@ Dentro de `src/jogadores/`, `src/clubes/`, `src/mercado/` e `src/liga/`, cada pa
 - `domain/`: regras de edição, transição de condição, exclusão e listagem. Funções sem dependência de NestJS ou Prisma.
 - `presenters/`: transforma os registros em respostas com os nomes e valores numéricos exigidos pela API, usando os cálculos compartilhados.
 - `swagger/`: documentação dos parâmetros da API.
-- `jogadores.module.ts`: registra controller, service e repository para injeção de dependências.
+- `players.module.ts`: registra controller, service e repository para injeção de dependências.
 
-Em `src/mercado/`, `CompraInputPipe` valida `club_id` e o formato de `loyalty_until`; `compra.rules.ts` aplica o prazo, a taxa e os limites de caixa e elenco. `venda.rules.ts` calcula multa, lucro, comissão progressiva, crédito e situação final do contrato. `MercadoService` coordena compra e venda, enquanto `MercadoRepository` concentra as consultas e faz caixa, vínculo do jogador, contrato, transação e saída da escalação participarem da mesma transação serializável. Os presenters montam as respostas `200` usando um mapeamento compartilhado de transação. `fidelidade.rules.ts` calcula dias restantes e percentual de multa para a consulta do clube e para a venda.
+Em `src/market/`, `PurchaseInputPipe` valida `club_id` e o formato de `loyalty_until`; `purchase.rules.ts` aplica o prazo, a taxa e os limites de caixa e elenco. `sale.rules.ts` calcula multa, lucro, comissão progressiva, crédito e situação final do contrato. `MarketService` coordena compra e venda, enquanto `MarketRepository` concentra as consultas e faz caixa, vínculo do jogador, contrato, transação e saída da escalação participarem da mesma transação serializável. Os presenters montam as respostas `200` usando um mapeamento compartilhado de transação. `loyalty.rules.ts` calcula dias restantes e percentual de multa para a consulta do clube e para a venda.
 
 A venda ignora o corpo, inclusive JSON malformado, conforme V1. Um jogador no elenco sem contrato ativo indica inconsistência dos dados: a venda retorna 500 sem gravar efeitos. Contratos ativos permanecem com esse status até a venda, mesmo após o prazo de fidelidade; nesse caso a venda os encerra sem multa.
 
-O histórico tem `HistoricoController`, `HistoricoService` e `HistoricoRepository` próprios dentro do módulo de mercado. JSON e CSV compartilham validação, consulta e apresentação das transações. O repository filtra e ordena no PostgreSQL, sem consultar os dados atuais do jogador para montar os registros históricos. `historico-resumo.ts` soma os valores com Decimal, e `historico-csv.presenter.ts` cuida do formato e do escape. Jogadores excluídos permanecem no histórico sem filtro; usá-los em `player_id` retorna 404. Sem registros, o JSON tem lista vazia e totais zerados, e o CSV contém somente cabeçalho e LF. O Content-Type CSV é definido após o sucesso da consulta, mantendo erros em JSON.
+O histórico tem `HistoryController`, `HistoryService` e `HistoryRepository` próprios dentro do módulo de mercado. JSON e CSV compartilham validação, consulta e apresentação das transações. O repository filtra e ordena no PostgreSQL, sem consultar os dados atuais do jogador para montar os registros históricos. `history-summary.ts` soma os valores com Decimal, e `history-csv.presenter.ts` cuida do formato e do escape. Jogadores excluídos permanecem no histórico sem filtro; usá-los em `player_id` retorna 404. Sem registros, o JSON tem lista vazia e totais zerados, e o CSV contém somente cabeçalho e LF. O Content-Type CSV é definido após o sucesso da consulta, mantendo erros em JSON.
 
-Em `src/liga/`, `EscalacaoInputPipe` valida formação e ids; `escalacao.rules.ts` confere clube, condição e distribuição dos setores definidos em `formacoes.ts`. `EscalacoesService` coordena a substituição, e `EscalacoesRepository` grava formação e cinco titulares numa transação serializável. O presenter reutiliza a apresentação de jogadores e a ordenação compartilhada em `common/orderings/elenco.ordering.ts`, também usada pela consulta de clube. Conflitos concorrentes retornam 409, sem repetição automática.
+Em `src/league/`, `LineupInputPipe` valida formação e ids; `lineup.rules.ts` confere clube, condição e distribuição dos setores definidos em `formations.ts`. `LineupsService` coordena a substituição, e `LineupsRepository` grava formação e cinco titulares numa transação serializável. O presenter reutiliza a apresentação de jogadores e a ordenação compartilhada em `common/orderings/squad.ordering.ts`, também usada pela consulta de clube. Conflitos concorrentes retornam 409, sem repetição automática.
 
-Ainda em `src/liga/`, `partida.rules.ts` seleciona os confrontos, aplica o efeito da condição e calcula gols; `classificacao.rules.ts` acumula placares e aplica desempates. Os controllers e pipes validam os dados e delegam aos serviços. `PartidasRepository` lê os titulares e grava partida e seis duelos na mesma transação serializável, preservando os dados usados. A consulta apresenta os registros gravados e deriva `result` do placar. `ClassificacaoService` lê clubes e placares numa transação consistente e calcula a tabela sem gravar pontos ou posições. No empate de nomes normalizados, o id crescente garante uma ordem estável, conforme as premissas.
+Ainda em `src/league/`, `match.rules.ts` seleciona os confrontos, aplica o efeito da condição e calcula gols; `standings.rules.ts` acumula placares e aplica desempates. Os controllers e pipes validam os dados e delegam aos serviços. `MatchesRepository` lê os titulares e grava partida e seis duelos na mesma transação serializável, preservando os dados usados. A consulta apresenta os registros gravados e deriva `result` do placar. `StandingsService` lê clubes e placares numa transação consistente e calcula a tabela sem gravar pontos ou posições. No empate de nomes normalizados, o id crescente garante uma ordem estável, conforme as premissas.
 
 `src/common/` mantém tipos, cálculos e parsers reutilizados. `src/database/` gerencia a conexão Prisma. O endpoint de saúde delega a consulta técnica ao `HealthService`.
 
 ### Transações e erros
 
-O service delimita a operação chamando `repository.emTransacao(...)`. O repository entrega ao callback uma instância vinculada ao cliente transacional. Assim, ler o jogador, remover da escalação e gravar a condição usam a mesma transação serializável. Uma falha desfaz tudo; o teste de integração simula essa situação no PostgreSQL.
+O service delimita a operação chamando `repository.withTransaction(...)`. O repository entrega ao callback uma instância vinculada ao cliente transacional. Assim, ler o jogador, remover da escalação e gravar a condição usam a mesma transação serializável. Uma falha desfaz tudo; o teste de integração simula essa situação no PostgreSQL.
 
-As regras de domínio lançam `RegraNegocioError`, sem depender de HTTP. O filtro central converte essa falha em `409` com `message`. Prazo de fidelidade fora da faixa lança `EntradaInvalidaError`, convertido em `400`. Formatos inválidos são recusados pelos pipes com `400`, e o service responde `404` quando não encontra o recurso ativo.
+As regras de domínio lançam `BusinessRuleError`, sem depender de HTTP. O filtro central converte essa falha em `409` com `message`. Prazo de fidelidade fora da faixa lança `InvalidInputError`, convertido em `400`. Formatos inválidos são recusados pelos pipes com `400`, e o service responde `404` quando não encontra o recurso ativo.
 
 Essa é uma arquitetura em camadas pragmática, não uma implementação completa de Clean Architecture: o repository retorna registros tipados pelo Prisma e o presenter conhece esse formato. A dependência do ORM está explícita nessa fronteira, enquanto as regras de domínio permanecem independentes.
 

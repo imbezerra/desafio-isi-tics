@@ -1,29 +1,29 @@
-export function normalizarTexto(valor: string): string {
-  return valor.replace(/^ +| +$/g, '').replace(/ {2,}/g, ' ');
+export function normalizeText(value: string): string {
+  return value.replace(/^ +| +$/g, '').replace(/ {2,}/g, ' ');
 }
 
-export function removerAcentos(valor: string): string {
-  return valor.normalize('NFD').replace(/\p{Mn}/gu, '');
+export function removeAccents(value: string): string {
+  return value.normalize('NFD').replace(/\p{Mn}/gu, '');
 }
 
-export function normalizarNomeClube(valor: string): string {
-  return normalizarTexto(valor).toLocaleLowerCase('pt-BR');
+export function normalizeClubName(value: string): string {
+  return normalizeText(value).toLocaleLowerCase('pt-BR');
 }
 
-export function normalizarParaOrdenacao(valor: string): string {
-  return removerAcentos(normalizarTexto(valor).toLocaleLowerCase('pt-BR'));
+export function normalizeForSorting(value: string): string {
+  return removeAccents(normalizeText(value).toLocaleLowerCase('pt-BR'));
 }
 
-export function compararNomes(primeiroNome: string, segundoNome: string): number {
-  const primeiro = [...normalizarParaOrdenacao(primeiroNome)];
-  const segundo = [...normalizarParaOrdenacao(segundoNome)];
-  for (let indice = 0; indice < Math.min(primeiro.length, segundo.length); indice++) {
-    const diferenca = primeiro[indice].codePointAt(0)! - segundo[indice].codePointAt(0)!;
-    if (diferenca !== 0) return diferenca;
+export function compareNames(firstName: string, secondName: string): number {
+  const first = [...normalizeForSorting(firstName)];
+  const second = [...normalizeForSorting(secondName)];
+  for (let index = 0; index < Math.min(first.length, second.length); index++) {
+    const difference = first[index].codePointAt(0)! - second[index].codePointAt(0)!;
+    if (difference !== 0) return difference;
   }
-  return primeiro.length - segundo.length;
+  return first.length - second.length;
 }
 
-export function possuiCaractereDeControle(valor: string): boolean {
-  return /\p{Cc}/u.test(valor);
+export function hasControlCharacter(value: string): boolean {
+  return /\p{Cc}/u.test(value);
 }

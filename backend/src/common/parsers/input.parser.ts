@@ -1,44 +1,44 @@
 import { BadRequestException } from '@nestjs/common';
 
-import { normalizarTexto, possuiCaractereDeControle } from '../formatters/text.formatter';
+import { normalizeText, hasControlCharacter } from '../formatters/text.formatter';
 
-export function parseObjeto(valor: unknown): Record<string, unknown> {
-  if (typeof valor !== 'object' || valor === null || Array.isArray(valor)) {
+export function parseObject(value: unknown): Record<string, unknown> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
     throw new BadRequestException('O corpo deve ser um objeto JSON.');
   }
-  return valor as Record<string, unknown>;
+  return value as Record<string, unknown>;
 }
 
-export function parseTexto(valor: unknown, campo: string, minimo: number, maximo: number): string {
-  if (typeof valor !== 'string' || possuiCaractereDeControle(valor)) {
-    throw new BadRequestException(`${campo} deve ser texto sem caracteres de controle.`);
+export function parseText(value: unknown, field: string, minimum: number, maximum: number): string {
+  if (typeof value !== 'string' || hasControlCharacter(value)) {
+    throw new BadRequestException(`${field} deve ser texto sem caracteres de controle.`);
   }
-  const texto = normalizarTexto(valor);
-  if ([...texto].length < minimo || [...texto].length > maximo) {
-    throw new BadRequestException(`${campo} deve ter entre ${minimo} e ${maximo} caracteres.`);
+  const text = normalizeText(value);
+  if ([...text].length < minimum || [...text].length > maximum) {
+    throw new BadRequestException(`${field} deve ter entre ${minimum} e ${maximum} caracteres.`);
   }
-  return texto;
+  return text;
 }
 
-export function parseInteiro(
-  valor: unknown,
-  campo: string,
-  minimo: number,
-  maximo: number,
+export function parseInteger(
+  value: unknown,
+  field: string,
+  minimum: number,
+  maximum: number,
 ): number {
-  if (typeof valor !== 'number' || !Number.isInteger(valor) || valor < minimo || valor > maximo) {
-    throw new BadRequestException(`${campo} deve ser inteiro entre ${minimo} e ${maximo}.`);
+  if (typeof value !== 'number' || !Number.isInteger(value) || value < minimum || value > maximum) {
+    throw new BadRequestException(`${field} deve ser inteiro entre ${minimum} e ${maximum}.`);
   }
-  return valor;
+  return value;
 }
 
-export function parseOpcao<T extends string>(
-  valor: unknown,
-  campo: string,
-  opcoes: readonly T[],
+export function parseOption<T extends string>(
+  value: unknown,
+  field: string,
+  options: readonly T[],
 ): T {
-  if (typeof valor !== 'string' || !opcoes.includes(valor as T)) {
-    throw new BadRequestException(`${campo} deve ser um de: ${opcoes.join(', ')}.`);
+  if (typeof value !== 'string' || !options.includes(value as T)) {
+    throw new BadRequestException(`${field} deve ser um de: ${options.join(', ')}.`);
   }
-  return valor as T;
+  return value as T;
 }
