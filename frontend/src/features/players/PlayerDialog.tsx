@@ -3,6 +3,7 @@ import { Icon } from '../../shared/components/Icon';
 import { Message } from '../../shared/components/Message';
 import { Modal } from '../../shared/components/Modal';
 import type { PlayerAction } from './PlayerActions';
+import { PlayerConditionForm } from './PlayerConditionForm';
 import { PlayerForm } from './PlayerForm';
 import { PlayerIdentity } from './PlayerIdentity';
 import { PlayerIndicators } from './PlayerIndicators';
@@ -46,6 +47,9 @@ export function PlayerDialog({
 
   if (kind === 'edit') return <PlayerForm player={player} onClose={onClose} onSaved={onSaved} />;
 
+  if (kind === 'condition')
+    return <PlayerConditionForm player={player} onClose={onClose} onSaved={onSaved} />;
+
   const club = clubs.find((item) => item.id === player.club_id);
 
   return (
@@ -79,6 +83,10 @@ export function PlayerDialog({
           <button className="button button-outline" onClick={() => onSelect('edit', player)}>
             <Icon name="action-edit" />
             Editar
+          </button>
+          <button className="button button-outline" onClick={() => onSelect('condition', player)}>
+            <Icon name="action-condition" />
+            Alterar condição
           </button>
         </footer>
       </div>

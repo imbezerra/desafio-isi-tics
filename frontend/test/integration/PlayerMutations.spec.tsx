@@ -50,6 +50,7 @@ async function fillCreate(user: ReturnType<typeof userEvent.setup>) {
 const flows = [
   { kind: 'create', method: 'POST', label: 'Salvar jogador', menu: '' },
   { kind: 'edit', method: 'PUT', label: 'Salvar alterações', menu: 'Editar' },
+  { kind: 'condition', method: 'PATCH', label: 'Salvar condição', menu: 'Alterar condição' },
 ] as const;
 
 async function prepareFlow(user: ReturnType<typeof userEvent.setup>, flow: (typeof flows)[number]) {
@@ -57,6 +58,8 @@ async function prepareFlow(user: ReturnType<typeof userEvent.setup>, flow: (type
 
   await openAction(user, flow.menu);
   const button = await screen.findByRole('button', { name: flow.label });
+
+  if (flow.kind === 'condition') await user.click(screen.getByRole('radio', { name: 'Doente' }));
 
   return button.closest('dialog')!;
 }
@@ -204,6 +207,42 @@ describe('Detalhes e edição', () => {
     );
 
     expect(await screen.findByRole('dialog', { name: 'Detalhes do jogador' })).toBeInTheDocument();
+  });
+});
+
+describe('Condição física', () => {
+  it('atualiza condição e mercado pela API e reaplica o filtro sem recarregar', async () => {
+    const api = mockPlayerApi();
+    const user = userEvent.setup();
+
+    renderApp('/players');
+    await user.selectOptions(screen.getByLabelText('Condição'), 'APTO');
+    await user.click(screen.getByRole('button', { name: 'Aplicar filtros' }));
+    await openAction(user, 'Alterar condição');
+    await screen.findByRole('button', { name: 'Salvar condição' });
+    await user.click(screen.getByRole('radio', { name: 'Doente' }));
+    await user.click(screen.getByRole('button', { name: 'Salvar condição' }));
+    await screen.findByText('Condição de João Silva atualizada com sucesso.');
+    expect(screen.getByText(/Nenhum jogador encontrado/)).toBeInTheDocument();
+    expect(screen.getByLabelText('Condição')).toHaveValue('APTO');
+    expect(screen.getByText('29,43')).toBeInTheDocument();
+    expect(JSON.parse(String(api.writes('PATCH')[0][1]?.body))).toEqual({ condition: 'DOENTE' });
+  });
+
+  it('explica a transição proibida de Doente direto para Apto sem enviar', async () => {
+    const api = mockPlayerApi({ initial: [{ ...player, condition: 'DOENTE' }] });
+    const user = userEvent.setup();
+
+    renderApp('/players');
+    await openAction(user, 'Alterar condição');
+    await screen.findByRole('button', { name: 'Salvar condição' });
+    await user.click(screen.getByRole('radio', { name: 'Apto' }));
+    await user.click(screen.getByRole('button', { name: 'Salvar condição' }));
+    expect(
+      screen.getByText('Jogador DOENTE não pode passar direto para APTO.'),
+    ).toBeInTheDocument();
+
+    expect(api.writes('PATCH')).toHaveLength(0);
   });
 });
 

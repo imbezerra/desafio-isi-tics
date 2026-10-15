@@ -8,14 +8,16 @@
   gap: 16px;
 }
 
-.position-options {
+.position-options,
+.condition-options {
   padding: 0;
   margin: 0;
   border: 0;
   min-width: 0;
 }
 
-.position-options legend {
+.position-options legend,
+.condition-options legend {
   padding: 0;
   margin-bottom: 8px;
   font-weight: 500;
@@ -64,7 +66,8 @@
   color: var(--muted-foreground);
 }
 
-.position-option.selected {
+.position-option.selected,
+.condition-options .selected {
   border-color: var(--primary);
   background: var(--primary-soft);
 }
@@ -215,6 +218,26 @@ meter::-webkit-meter-optimum-value {
 
 .identity-text small {
   color: var(--muted-foreground);
+}
+
+.condition-options label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.condition-options small {
+  margin-left: auto;
+  color: var(--muted-foreground);
+}
+
+.condition-options input {
+  accent-color: var(--primary);
 }
 
 .player-result {

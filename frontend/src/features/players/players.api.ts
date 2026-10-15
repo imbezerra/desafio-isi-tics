@@ -1,5 +1,5 @@
 import { apiGet, apiWrite } from '../../shared/api/client';
-import type { Player, PlayerList } from '../../shared/api/contracts';
+import type { Player, PlayerList, PlayerCondition } from '../../shared/api/contracts';
 
 export type EditPlayerInput = Pick<Player, 'name' | 'position' | 'age' | 'agility'>;
 
@@ -19,6 +19,10 @@ export function createPlayer(input: CreatePlayerInput) {
 
 export function editPlayer(id: number, input: EditPlayerInput) {
   return apiWrite<Player>('PUT', `/players/${id}`, input);
+}
+
+export function changePlayerCondition(id: number, condition: PlayerCondition) {
+  return apiWrite<Player>('PATCH', `/players/${id}/condition`, { condition });
 }
 
 export interface PlayerFilters {

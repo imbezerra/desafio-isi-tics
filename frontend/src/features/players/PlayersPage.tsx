@@ -140,7 +140,9 @@ export function PlayersPage() {
       message:
         selection?.kind === 'create'
           ? `${player.name} cadastrado com sucesso.`
-          : `${player.name} atualizado com sucesso.`,
+          : selection?.kind === 'condition'
+            ? `Condição de ${player.name} atualizada com sucesso.`
+            : `${player.name} atualizado com sucesso.`,
       player,
     });
 

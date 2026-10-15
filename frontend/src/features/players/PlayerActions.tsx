@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import type { Player } from '../../shared/api/contracts';
 import { Icon } from '../../shared/components/Icon';
 
-export type PlayerAction = 'details' | 'edit';
+export type PlayerAction = 'details' | 'edit' | 'condition';
 
 export function PlayerActions({
   player,
@@ -64,6 +64,7 @@ export function PlayerActions({
   const actions: { kind: PlayerAction; label: string; icon: string }[] = [
     { kind: 'details', label: 'Ver detalhes', icon: 'action-details' },
     { kind: 'edit', label: 'Editar', icon: 'action-edit' },
+    { kind: 'condition', label: 'Alterar condição', icon: 'action-condition' },
   ];
 
   return (
