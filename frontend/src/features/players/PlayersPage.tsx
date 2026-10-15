@@ -11,20 +11,11 @@ import { useClubs } from '../overview/overview.queries';
 import { usePlayers } from './players.queries';
 import { initialFilters, type PlayerFilters } from './players.api';
 import { PlayerFiltersForm } from './PlayerFiltersForm';
+import { conditions, positions } from './player-fields';
+import { PlayerForm } from './PlayerForm';
+import { PlayerResult } from './PlayerResult';
 import './players.css';
-
-const positions = {
-  GOL: 'Goleiro',
-  ZAG: 'Zagueiro',
-  LAT: 'Lateral',
-  MEI: 'Meio-campo',
-  ATA: 'Atacante',
-};
-const conditions = {
-  APTO: { label: 'Apto', className: 'fit', icon: 'condition-fit' },
-  MAL_CONDICIONADO: { label: 'Mal condicionado', className: 'unfit', icon: 'condition-unfit' },
-  DOENTE: { label: 'Doente', className: 'sick', icon: 'condition-sick' },
-};
+import './player-dialogs.css';
 
 function createColumns(clubs: Club[]): Column<Player>[] {
   return [
@@ -121,6 +112,18 @@ export function PlayersPage() {
   const players = usePlayers(filters, page);
   const clubs = useClubs();
   const queryClient = useQueryClient();
+  const [selection, setSelection] = useState<{ kind: 'create' }>();
+  const [notice, setNotice] = useState<{ message: string; player?: Player }>();
+
+  async function saved(player: Player) {
+    await queryClient.invalidateQueries();
+    setNotice({
+      message: `${player.name} cadastrado com sucesso.`,
+      player,
+    });
+
+    setSelection(undefined);
+  }
 
   function applyFilters(next: PlayerFilters) {
     setFilters(next);
@@ -142,7 +145,32 @@ export function PlayersPage() {
           <h1>Jogadores</h1>
           <p>Consulte os indicadores e encontre os jogadores da sua liga.</p>
         </div>
+        <button
+          className="button button-primary new-player"
+          onClick={() => setSelection({ kind: 'create' })}
+        >
+          <Icon name="player-create" />
+          Novo jogador
+        </button>
       </header>
+      {notice && (
+        <section className="mutation-result" aria-label="Resultado da ação">
+          <Message tone="success">
+            {notice.message}
+            <button
+              className="button button-ghost"
+              aria-label="Dispensar resultado"
+              onClick={() => setNotice(undefined)}
+            >
+              Fechar
+            </button>
+          </Message>
+          {notice.player && <PlayerResult player={notice.player} />}
+          <small className="muted">
+            A lista abaixo mantém os filtros aplicados. Os dados desta confirmação vieram da API.
+          </small>
+        </section>
+      )}
       <PlayerFiltersForm clubs={clubs.data ?? []} onApply={applyFilters} />
       {clubs.isError && (
         <Message tone="error" onRetry={() => void clubs.refetch()}>
@@ -164,7 +192,7 @@ export function PlayersPage() {
           loading={players.isPending}
           error={players.error?.message}
           onRetry={() => void players.refetch()}
-          emptyMessage="Nenhum jogador encontrado. Tente ajustar os filtros ou cadastre jogadores na próxima etapa."
+          emptyMessage="Nenhum jogador encontrado. Tente ajustar os filtros ou cadastre um novo jogador."
         />
         {players.data && !players.isError && (
           <Pagination
@@ -180,10 +208,9 @@ export function PlayersPage() {
       <p className="page-note">
         Overall e valores são devolvidos pela API. A busca ignora maiúsculas, minúsculas e acentos.
       </p>
-      <Message>
-        Primeira etapa: consulta de jogadores. Cadastro, edição, condição, exclusão e compra serão
-        adicionados nas próximas entregas.
-      </Message>
+      {selection?.kind === 'create' && (
+        <PlayerForm onClose={() => setSelection(undefined)} onSaved={saved} />
+      )}
     </AppShell>
   );
 }

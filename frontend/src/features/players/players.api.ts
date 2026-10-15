@@ -1,5 +1,17 @@
-import { apiGet } from '../../shared/api/client';
-import type { PlayerList } from '../../shared/api/contracts';
+import { apiGet, apiWrite } from '../../shared/api/client';
+import type { Player, PlayerList } from '../../shared/api/contracts';
+
+export type EditPlayerInput = Pick<Player, 'name' | 'position' | 'age' | 'agility'>;
+
+export type CreatePlayerInput = EditPlayerInput &
+  Pick<
+    Player,
+    'pace' | 'shooting' | 'passing' | 'dribbling' | 'defending' | 'physical' | 'potential'
+  >;
+
+export function createPlayer(input: CreatePlayerInput) {
+  return apiWrite<Player>('POST', '/players', input);
+}
 
 export interface PlayerFilters {
   search: string;
