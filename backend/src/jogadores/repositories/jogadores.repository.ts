@@ -53,9 +53,9 @@ export class JogadoresRepository {
         excluidoEm: null,
         posicao: consulta.position,
         condicao: consulta.condition,
-        idade: { gte: consulta.minAge, lte: consulta.maxAge },
+        idade: { gte: consulta.idadeMinima, lte: consulta.idadeMaxima },
         clubeId:
-          consulta.clubId ??
+          consulta.clubeId ??
           (consulta.free === true ? null : consulta.free === false ? { not: null } : undefined),
       },
     });

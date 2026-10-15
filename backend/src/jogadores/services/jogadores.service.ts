@@ -30,7 +30,7 @@ export class JogadoresService {
   }
 
   async listar(consulta: ConsultaJogadores) {
-    if (consulta.clubId !== undefined && !(await this.repositorio.clubeExiste(consulta.clubId))) {
+    if (consulta.clubeId !== undefined && !(await this.repositorio.clubeExiste(consulta.clubeId))) {
       throw new NotFoundException('Clube não encontrado.');
     }
     const jogadores = await this.repositorio.listarCandidatos(consulta);

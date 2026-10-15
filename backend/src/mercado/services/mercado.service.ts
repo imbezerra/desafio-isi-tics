@@ -63,16 +63,16 @@ export class MercadoService {
 
   async comprar(jogadorId: number, entrada: EntradaCompra) {
     const momento = new Date();
-    validarPrazoFidelidade(entrada.loyaltyUntil, momento);
+    validarPrazoFidelidade(entrada.fidelidadeAte, momento);
     try {
       return await this.repositorio.emTransacao(async (repositorio) => {
         const jogador = await repositorio.buscarJogadorAtivo(jogadorId);
         if (!jogador) throw new NotFoundException('Jogador não encontrado.');
-        const clube = await repositorio.buscarClube(entrada.clubId);
+        const clube = await repositorio.buscarClube(entrada.clubeId);
         if (!clube) throw new NotFoundException('Clube não encontrado.');
         const [vendidoAntes, tamanhoElenco] = await Promise.all([
-          repositorio.clubeJaVendeuJogador(entrada.clubId, jogadorId),
-          repositorio.contarElenco(entrada.clubId),
+          repositorio.clubeJaVendeuJogador(entrada.clubeId, jogadorId),
+          repositorio.contarElenco(entrada.clubeId),
         ]);
         validarCompra(jogador.clubeId !== null, vendidoAntes, tamanhoElenco);
 
@@ -89,7 +89,7 @@ export class MercadoService {
           jogador.id,
           clube.id,
           compra.valor.toString(),
-          entrada.loyaltyUntil,
+          entrada.fidelidadeAte,
           momento,
         );
         const transacao = await repositorio.criarTransacaoCompra(

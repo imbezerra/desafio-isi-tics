@@ -36,8 +36,8 @@ export function montarListaJogadores<T extends JogadorNaLista>(
   const filtrados = jogadores.filter(
     (jogador) =>
       (busca === undefined || normalizarParaOrdenacao(jogador.name).includes(busca)) &&
-      jogador.market_value >= consulta.minValue &&
-      jogador.market_value <= consulta.maxValue,
+      jogador.market_value >= consulta.valorMinimo &&
+      jogador.market_value <= consulta.valorMaximo,
   );
   filtrados.sort((a, b) => {
     for (const criterio of consulta.sort) {

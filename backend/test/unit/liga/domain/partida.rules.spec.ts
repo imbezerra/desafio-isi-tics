@@ -24,8 +24,8 @@ describe('duelos e placar conforme RN20', () => {
         position: posicoes[indice],
       }));
       const partida = jogarPartida(mandante, visitante);
-      expect(partida.duels.slice(0, 3).map((d) => d.attacker.attribute)).toEqual(atributos);
-      expect(partida.duels.every((d) => d.defender.attribute === 'defending')).toBe(true);
+      expect(partida.duelos.slice(0, 3).map((d) => d.attacker.attribute)).toEqual(atributos);
+      expect(partida.duelos.every((d) => d.defender.attribute === 'defending')).toBe(true);
     },
   );
 
@@ -34,9 +34,9 @@ describe('duelos e placar conforme RN20', () => {
     mandante.players.reverse();
     const original = structuredClone({ mandante, visitante });
     const partida = jogarPartida(mandante, visitante);
-    expect(partida).toMatchObject({ homeGoals: 1, awayGoals: 2 });
+    expect(partida).toMatchObject({ golsMandante: 1, golsVisitante: 2 });
     expect(
-      partida.duels.map((d) => [
+      partida.duelos.map((d) => [
         d.order,
         d.attacker.player_name,
         d.defender.player_name,
@@ -52,7 +52,7 @@ describe('duelos e placar conforme RN20', () => {
       [5, 'Nei Soares', 'Téo Brandão', 70, 84, false],
       [6, 'Lino Matos', 'Davi Lins', 79, 56, true],
     ]);
-    expect(partida.duels.map((d) => d.attacker.attribute)).toEqual([
+    expect(partida.duelos.map((d) => d.attacker.attribute)).toEqual([
       'shooting',
       'passing',
       'dribbling',
@@ -60,7 +60,7 @@ describe('duelos e placar conforme RN20', () => {
       'passing',
       'dribbling',
     ]);
-    expect(determinarResultado(partida.homeGoals, partida.awayGoals)).toBe('VISITANTE');
+    expect(determinarResultado(partida.golsMandante, partida.golsVisitante)).toBe('VISITANTE');
     expect(jogarPartida(mandante, visitante)).toEqual(partida);
     expect({ mandante, visitante }).toEqual(original);
   });

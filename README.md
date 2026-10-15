@@ -28,6 +28,8 @@ docker compose ps
 docker compose logs backend
 ```
 
+Cada requisição concluída gera uma única linha pelo Logger do NestJS, com data/hora de Brasília, método, caminho e status final, inclusive nas recusas. Corpos e query strings não são registrados.
+
 ## Criação e recriação do banco
 
 A criação inicial ocorre no primeiro comando de execução acima. Para recriar o banco da aplicação do zero, apagando seus registros e reaplicando as migrations, execute na raiz:
@@ -66,6 +68,7 @@ As bibliotecas e os motivos de uso estão descritos no README do backend.
 
 - As regras monetárias usam precisão decimal e arredondamento somente no resultado final de cada cálculo.
 - O banco mantém os nomes em português exigidos; as respostas HTTP usam os nomes em inglês e snake_case do contrato.
+- Identificadores internos adotam português em camelCase. Estruturas que espelham os campos obrigatórios da API preservam os nomes em inglês; os pipes convertem aliases internos e os presenters montam as respostas, sem alterar o contrato HTTP.
 - Arquitetura em camadas com Repository: controllers delegam ao serviço, serviços coordenam regras e transações, e repositories concentram o Prisma. Funções de domínio validam regras; pipes validam os formatos sem converter textos em números nos corpos JSON. A explicação de cada camada está no README do backend.
 - A exclusão de jogador é lógica. Registros históricos não são apagados.
 - Na listagem, o PostgreSQL aplica filtros persistidos. Busca Unicode, filtro de mercado e ordenação são feitos na API antes de paginar, reutilizando o cálculo central de mercado. Essa escolha evita duplicar a fórmula em SQL, mas consome memória proporcional aos jogadores candidatos. Para volumes elevados, essa etapa precisará migrar para consultas especializadas no banco.
@@ -75,7 +78,7 @@ As bibliotecas e os motivos de uso estão descritos no README do backend.
 
 ## Funcionalidades não implementadas
 
-Interface React; logs HTTP por requisição. As rotas funcionais de jogadores, clubes, mercado e liga estão implementadas, incluindo partidas, histórico e classificação. A venda e a mudança para `DOENTE` removem titulares da escalação atomicamente, preservando a formação; recuperar a condição não reinsere o jogador automaticamente.
+Interface React e sua inclusão no Docker Compose. As rotas funcionais de jogadores, clubes, mercado e liga estão implementadas, incluindo partidas, histórico e classificação. A venda e a mudança para `DOENTE` removem titulares da escalação atomicamente, preservando a formação; recuperar a condição não reinsere o jogador automaticamente.
 
 ## Uso de inteligência artificial
 

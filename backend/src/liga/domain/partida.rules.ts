@@ -94,7 +94,7 @@ export function jogarPartida(mandante: TimePartida, visitante: TimePartida) {
     [3, 1],
     [2, 2],
   ] as const;
-  const duels = [
+  const duelos = [
     ...confrontos.map(([atacante, defensor], i) =>
       calcularDuelo(i + 1, mandante.id, titularesMandante[atacante], titularesVisitante[defensor]),
     ),
@@ -103,13 +103,13 @@ export function jogarPartida(mandante: TimePartida, visitante: TimePartida) {
     ),
   ];
   return {
-    homeId: mandante.id,
-    awayId: visitante.id,
-    homeFormation: mandante.formation,
-    awayFormation: visitante.formation,
-    homeGoals: duels.slice(0, 3).filter((d) => d.goal).length,
-    awayGoals: duels.slice(3).filter((d) => d.goal).length,
-    duels,
+    mandanteId: mandante.id,
+    visitanteId: visitante.id,
+    formacaoMandante: mandante.formation,
+    formacaoVisitante: visitante.formation,
+    golsMandante: duelos.slice(0, 3).filter((duelo) => duelo.goal).length,
+    golsVisitante: duelos.slice(3).filter((duelo) => duelo.goal).length,
+    duelos,
   };
 }
 

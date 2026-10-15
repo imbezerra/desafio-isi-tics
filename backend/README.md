@@ -12,6 +12,12 @@ Para jogar, envie `POST /api/v1/matches` com `{ "home_club_id": 1, "away_club_id
 
 Siga a [execução na raiz](../README.md). A API em `http://localhost:3000` aplica migrations antes de iniciar, sem inserir dados de exemplo.
 
+## Logs HTTP
+
+O Logger do NestJS registra uma linha por requisição concluída: data/hora de Brasília, método, caminho e status final. Exemplo do conteúdo: `2026-10-14T10:30:00-03:00 GET /api/v1/players 200`. O middleware é registrado antes do parser JSON e do CORS, incluindo recusas por JSON malformado, rotas inexistentes e preflight. Corpos e query strings ficam fora do log.
+
+No Docker, execute `docker compose logs -f backend` na raiz; no desenvolvimento local, acompanhe o terminal de `npm run start:dev`. Os testes HTTP de `test/integration/common/` verificam uma chamada ao Logger por resposta, com os status 200, 400, 404, 409 e 204.
+
 ## Desenvolvimento local no Ubuntu 24.04
 
 Na raiz, inicie o banco:
@@ -49,7 +55,9 @@ npm run format:check
 npm test
 ```
 
-Os testes unitários ficam em `test/unit/`, organizados por área: `common/`, `jogadores/`, `clubes/`, `mercado/` e `liga/`. Essa estrutura espelha os diretórios de `src/`. O Jest procura os arquivos `*.spec.ts` somente nessa pasta. O comando termina sozinho e inclui os exemplos de valor de mercado RN02–RN05.
+Os testes unitários ficam em `test/unit/`, organizados por área: `common/`, `jogadores/`, `clubes/`, `mercado/` e `liga/`. Essas áreas espelham os diretórios de `src/`; `tooling/` verifica a compatibilidade das ferramentas de teste. O Jest procura os arquivos `*.spec.ts` somente nessa pasta. O comando termina sozinho e inclui os exemplos de valor de mercado RN02–RN05.
+
+Os testes usam Jest 30, `@types/jest` 30 e `ts-jest` 29.4.14 ou superior na linha 29, que declara suporte ao Jest 30. A numeração principal do transformador não precisa ser igual à do executor. O [guia de migração do Jest](https://jestjs.io/docs/upgrading-to-jest30) orienta a revisão de tipos, matchers e configuração; o projeto mantém a separação entre testes unitários e de integração e a execução sem modo de observação.
 
 ## Testes de integração
 
@@ -98,6 +106,14 @@ Partidas e classificação usam o exemplo da RN20 (Águias FC 1 × 2 Delta FC) c
 - ESLint, `typescript-eslint`, Prettier e plugins/configurações associados: análise estática e formatação.
 - TypeScript, Nest CLI, schematics, ts-node, ts-loader e source-map-support: compilação e ferramentas de desenvolvimento.
 - Pacotes `@types/*`: declarações de tipos para Node.js, Express e Jest.
+
+### Correções de dependências transitivas
+
+Os `overrides` do npm são restritos aos consumidores afetados: Swagger usa `js-yaml` 5.4.3 e `@prisma/config` usa `deepmerge-ts` 8.0.0. São correções dos alertas [GHSA-r3ph-w7gj-g6xm](https://github.com/advisories/GHSA-r3ph-w7gj-g6xm) e [GHSA-ggr8-5vv4-36mx](https://github.com/advisories/GHSA-ggr8-5vv4-36mx), sem migrar NestJS ou Prisma de versão principal. O [deepmerge-ts 8](https://github.com/RebeccaStevens/deepmerge-ts/releases/tag/v8.0.0) altera o tratamento de Maps e algumas APIs; o Prisma instalado usa a função `deepmerge` para configuração, e este projeto não usa Maps nem configuração Prisma customizada. Geração do cliente, migrations, reset, testes e imagem Docker devem ser revalidados ao alterar essas versões. O lockfile fixa a árvore instalada.
+
+Na árvore de testes, o override de `@istanbuljs/load-nyc-config` usa `js-yaml` 4.3.2 em vez da linha 3, retirando a cadeia antiga `argparse` 1 → `sprintf-js` afetada pelo alerta GHSA-hp3w-g68c-fv3c. O consumidor usa a API `load`, preservada na versão escolhida. `test/unit/tooling/nyc-config.compatibility.spec.ts` carrega a configuração de `test/fixtures/nyc-compatibility.yml` pelo pacote real do Istanbul para verificar essa compatibilidade. O override não altera o YAML usado pelo Swagger.
+
+Verificação: `npm audit --omit=dev` para a árvore de produção; `npm audit` inclui as ferramentas de desenvolvimento. Em 14/10/2026, a migração para Jest 30 e o ajuste restrito do carregador de cobertura eliminaram os 34 apontamentos anteriores: ambas as auditorias retornaram zero na resolução limpa das dependências. O resultado representa os alertas conhecidos nessa data, não uma garantia de ausência de vulnerabilidades futuras. Não foi utilizado `audit fix --force`.
 
 ## Arquitetura em camadas por módulo
 

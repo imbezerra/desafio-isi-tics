@@ -18,11 +18,11 @@ export type ConsultaJogadores = {
   position?: Posicao;
   condition?: Condicao;
   free?: boolean;
-  clubId?: number;
-  minAge: number;
-  maxAge: number;
-  minValue: number;
-  maxValue: number;
+  clubeId?: number;
+  idadeMinima: number;
+  idadeMaxima: number;
+  valorMinimo: number;
+  valorMaximo: number;
   sort: OrdenacaoJogador[];
   page: number;
   limit: number;

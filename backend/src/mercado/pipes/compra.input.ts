@@ -8,10 +8,10 @@ import { EntradaCompra } from '../dto/compra.dto';
 export class CompraInputPipe implements PipeTransform<unknown, EntradaCompra> {
   transform(valor: unknown): EntradaCompra {
     const objeto = parseObjeto(valor);
-    const clubId = parseInteiro(objeto.club_id, 'club_id', 1, 2_147_483_647);
+    const clubeId = parseInteiro(objeto.club_id, 'club_id', 1, 2_147_483_647);
     if (typeof objeto.loyalty_until !== 'string') {
       throw new BadRequestException('loyalty_until deve ser uma data e hora válida.');
     }
-    return { clubId, loyaltyUntil: parseDataHoraBrasilia(objeto.loyalty_until) };
+    return { clubeId, fidelidadeAte: parseDataHoraBrasilia(objeto.loyalty_until) };
   }
 }

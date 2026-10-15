@@ -8,7 +8,7 @@ describe('entrada de compra conforme V1–V7 e RN01', () => {
   it('aceita formato de Brasília e ignora campos extras', () => {
     expect(
       pipe.transform({ club_id: 1, loyalty_until: '2027-03-02T10:15-03:00', cash: 999 }),
-    ).toEqual({ clubId: 1, loyaltyUntil: new Date('2027-03-02T13:15:00Z') });
+    ).toEqual({ clubeId: 1, fidelidadeAte: new Date('2027-03-02T13:15:00Z') });
   });
 
   it.each([

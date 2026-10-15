@@ -51,20 +51,20 @@ export class ConsultaJogadoresPipe implements PipeTransform<
         query.free === undefined
           ? undefined
           : parseOpcao(query.free, 'free', ['true', 'false']) === 'true',
-      clubId:
+      clubeId:
         query.club_id === undefined ? undefined : parseIdDaConsulta(textoConsulta(query.club_id)),
-      minAge: inteiroConsulta(query.min_age, 16, 16, 45),
-      maxAge: inteiroConsulta(query.max_age, 45, 16, 45),
-      minValue: valorConsulta(query.min_value, 0),
-      maxValue: valorConsulta(query.max_value, 550),
+      idadeMinima: inteiroConsulta(query.min_age, 16, 16, 45),
+      idadeMaxima: inteiroConsulta(query.max_age, 45, 16, 45),
+      valorMinimo: valorConsulta(query.min_value, 0),
+      valorMaximo: valorConsulta(query.max_value, 550),
       sort: sort.map((valor) => parseOpcao(valor, 'sort', ORDENACOES_JOGADOR)),
       page: inteiroConsulta(query.page, 1, 1, 2_147_483_647),
       limit: inteiroConsulta(query.limit, 10, 1, 50),
     };
     if (
-      consulta.minAge > consulta.maxAge ||
-      consulta.minValue > consulta.maxValue ||
-      (consulta.free === true && consulta.clubId !== undefined)
+      consulta.idadeMinima > consulta.idadeMaxima ||
+      consulta.valorMinimo > consulta.valorMaximo ||
+      (consulta.free === true && consulta.clubeId !== undefined)
     ) {
       throw new BadRequestException('Combinação contraditória de filtros.');
     }

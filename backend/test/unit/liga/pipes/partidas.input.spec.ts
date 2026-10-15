@@ -8,8 +8,8 @@ describe('validação de partidas', () => {
 
   it('aceita clubes distintos e ignora campos controlados', () => {
     expect(entrada.transform({ home_club_id: 1, away_club_id: 2, goals: 10 })).toEqual({
-      homeClubId: 1,
-      awayClubId: 2,
+      mandanteId: 1,
+      visitanteId: 2,
     });
     expect(consulta.transform({ extra: 'x' })).toEqual({});
     expect(consulta.transform({ club_id: '2' })).toEqual({ clubeId: 2 });

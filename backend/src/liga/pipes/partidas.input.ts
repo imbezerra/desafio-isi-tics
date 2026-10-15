@@ -7,11 +7,11 @@ import { EntradaPartida } from '../dto/partida.dto';
 export class PartidaInputPipe implements PipeTransform<unknown, EntradaPartida> {
   transform(valor: unknown): EntradaPartida {
     const objeto = parseObjeto(valor);
-    const homeClubId = parseInteiro(objeto.home_club_id, 'home_club_id', 1, 2_147_483_647);
-    const awayClubId = parseInteiro(objeto.away_club_id, 'away_club_id', 1, 2_147_483_647);
-    if (homeClubId === awayClubId) {
+    const mandanteId = parseInteiro(objeto.home_club_id, 'home_club_id', 1, 2_147_483_647);
+    const visitanteId = parseInteiro(objeto.away_club_id, 'away_club_id', 1, 2_147_483_647);
+    if (mandanteId === visitanteId) {
       throw new BadRequestException('Mandante e visitante devem ser clubes diferentes.');
     }
-    return { homeClubId, awayClubId };
+    return { mandanteId, visitanteId };
   }
 }

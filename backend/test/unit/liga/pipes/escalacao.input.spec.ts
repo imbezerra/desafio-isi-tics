@@ -7,8 +7,8 @@ describe('entrada da escalação conforme RN19 e V1–V7', () => {
 
   it('aceita cinco ids distintos fora de ordem e ignora campos extras', () => {
     expect(pipe.transform({ formation: '2-1-1', player_ids: [5, 4, 3, 2, 1], cash: 0 })).toEqual({
-      formation: '2-1-1',
-      playerIds: [5, 4, 3, 2, 1],
+      formacao: '2-1-1',
+      jogadoresIds: [5, 4, 3, 2, 1],
     });
   });
 

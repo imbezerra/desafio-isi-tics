@@ -48,15 +48,15 @@ export class PartidasRepository {
   salvar(partida: PartidaCalculada, momento: Date): Promise<PartidaComDuelos> {
     return this.banco.partida.create({
       data: {
-        mandanteId: partida.homeId,
-        visitanteId: partida.awayId,
-        golsMandante: partida.homeGoals,
-        golsVisitante: partida.awayGoals,
-        formacaoMandante: partida.homeFormation,
-        formacaoVisitante: partida.awayFormation,
+        mandanteId: partida.mandanteId,
+        visitanteId: partida.visitanteId,
+        golsMandante: partida.golsMandante,
+        golsVisitante: partida.golsVisitante,
+        formacaoMandante: partida.formacaoMandante,
+        formacaoVisitante: partida.formacaoVisitante,
         jogadaEm: momento,
         duelos: {
-          create: partida.duels.map((duelo) => ({
+          create: partida.duelos.map((duelo) => ({
             ordem: duelo.order,
             clubeAtacanteId: duelo.attacking_club_id,
             atacanteId: duelo.attacker.player_id,

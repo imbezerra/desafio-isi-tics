@@ -36,10 +36,10 @@ export class EscalacoesRepository {
     await this.banco.escalacao.deleteMany({ where: { clubeId } });
     await this.banco.clube.update({
       where: { id: clubeId },
-      data: { formacao: entrada.formation },
+      data: { formacao: entrada.formacao },
     });
     await this.banco.escalacao.createMany({
-      data: entrada.playerIds.map((jogadorId) => ({ clubeId, jogadorId })),
+      data: entrada.jogadoresIds.map((jogadorId) => ({ clubeId, jogadorId })),
     });
   }
 }

@@ -2,8 +2,10 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { json, NextFunction, Request, Response } from 'express';
 
 import { HttpExceptionFilter } from './common/errors/http-exception.filter';
+import { criarRegistroHttp } from './common/logging/http-logging.middleware';
 
 export function configurarApi(app: INestApplication): void {
+  app.use(criarRegistroHttp());
   const lerJson = json();
   app.use((pedido: Request, resposta: Response, proximo: NextFunction) => {
     const vendaSemCorpo =

@@ -97,7 +97,7 @@ describe('query params conforme RN07', () => {
       }),
     ).toMatchObject({
       free: false,
-      clubId: 1,
+      clubeId: 1,
       sort: ['value_desc', 'age_asc'],
       page: 1,
       limit: 10,

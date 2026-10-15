@@ -19,11 +19,11 @@ export class EscalacoesService {
     try {
       return await this.repositorio.emTransacao(async (repositorio) => {
         await this.obterClube(repositorio, id);
-        const jogadores = await repositorio.buscarJogadoresAtivos(entrada.playerIds);
-        if (jogadores.length !== entrada.playerIds.length) {
+        const jogadores = await repositorio.buscarJogadoresAtivos(entrada.jogadoresIds);
+        if (jogadores.length !== entrada.jogadoresIds.length) {
           throw new NotFoundException('Um dos jogadores não foi encontrado.');
         }
-        validarEscalacao(id, entrada.formation, jogadores);
+        validarEscalacao(id, entrada.formacao, jogadores);
         await repositorio.substituir(id, entrada);
         return apresentarEscalacao(await this.obterClube(repositorio, id));
       });

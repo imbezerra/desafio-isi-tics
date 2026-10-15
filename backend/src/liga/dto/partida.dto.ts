@@ -1,2 +1,2 @@
-export type EntradaPartida = { homeClubId: number; awayClubId: number };
+export type EntradaPartida = { mandanteId: number; visitanteId: number };
 export type ConsultaPartidas = { clubeId?: number };

@@ -115,4 +115,16 @@ describe('API de clubes com PostgreSQL real', () => {
     expect(consulta.dados).toMatchObject({ ...aguias, players: [] });
     expect((await requisicao('/clubs/999')).status).toBe(404);
   });
+
+  it('aplica a definição de palavra e preserva a primeira letra Unicode na sigla', async () => {
+    for (const name of ['Águias - .', 'Ω Águias']) {
+      const resposta = await requisicao('/clubs', 'POST', { name, acronym: 'AGU' });
+      expect(resposta.status).toBe(400);
+      expect(resposta.dados).toMatchObject({ message: expect.any(String) });
+    }
+    expect(await banco.clube.count()).toBe(0);
+    await cadastrar('A B C D E - .', 'ABC');
+    await cadastrar('Aliança Azul Bairro', 'AAB');
+    expect(await banco.clube.count()).toBe(2);
+  });
 });

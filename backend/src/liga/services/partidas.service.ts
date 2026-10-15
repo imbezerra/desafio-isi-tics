@@ -18,8 +18,8 @@ export class PartidasService {
   async jogar(entrada: EntradaPartida) {
     try {
       return await this.repositorio.emTransacao(async (repositorio) => {
-        const mandante = await repositorio.buscarClubeComTitulares(entrada.homeClubId);
-        const visitante = await repositorio.buscarClubeComTitulares(entrada.awayClubId);
+        const mandante = await repositorio.buscarClubeComTitulares(entrada.mandanteId);
+        const visitante = await repositorio.buscarClubeComTitulares(entrada.visitanteId);
         if (!mandante || !visitante) throw new NotFoundException('Clube não encontrado.');
         const calculo = jogarPartida(prepararTimePartida(mandante), prepararTimePartida(visitante));
         return apresentarPartida(await repositorio.salvar(calculo, new Date()));

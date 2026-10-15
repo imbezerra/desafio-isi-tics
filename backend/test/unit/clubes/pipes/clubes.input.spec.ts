@@ -16,6 +16,9 @@ describe('validação de clubes conforme V4 e RN10', () => {
     null,
     [],
     { name: 'Águias', acronym: 'AGU' },
+    { name: 'Águias - .', acronym: 'AGU' },
+    { name: 'Ω Águias', acronym: 'AGU' },
+    { name: 'ß Águias', acronym: 'SAG' },
     { name: 'Águias FC Clube Cidade Time Extra', acronym: 'AGU' },
     { name: 'Águias 123', acronym: 'AGU' },
     { name: 'Águias FC', acronym: 'agu' },
@@ -30,6 +33,14 @@ describe('validação de clubes conforme V4 e RN10', () => {
       name: 'Águias Futebol Clube',
       acronym: 'AFC',
     });
+  });
+
+  it.each([
+    { name: 'A B C D E - .', acronym: 'ABC' },
+    { name: 'Aliança Azul Bairro', acronym: 'AAB' },
+    { name: '- Águias . Futebol Clube', acronym: 'AFC' },
+  ])('conta somente palavras com letras e permite duas letras iguais: %j', (valor) => {
+    expect(cadastro.transform(valor)).toEqual(valor);
   });
 });
 
