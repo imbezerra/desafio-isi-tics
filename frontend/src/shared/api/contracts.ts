@@ -13,6 +13,13 @@ export interface Player {
   base_value: number;
   market_value: number;
   club_id: number | null;
+  pace: number;
+  shooting: number;
+  passing: number;
+  dribbling: number;
+  defending: number;
+  physical: number;
+  potential: number;
 }
 
 export interface PlayerList {

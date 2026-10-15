@@ -20,6 +20,13 @@ export const player: Player = {
   base_value: 34.2,
   market_value: 37.62,
   club_id: null,
+  pace: 70,
+  shooting: 65,
+  passing: 80,
+  dribbling: 75,
+  defending: 60,
+  physical: 70,
+  potential: 85,
 };
 
 export function playerList(

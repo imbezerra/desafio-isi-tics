@@ -1,7 +1,28 @@
 import { describe, expect, it, vi } from 'vitest';
-import { apiGet, ApiError } from '../../../../src/shared/api/client';
+import { apiGet, apiWrite, ApiError } from '../../../../src/shared/api/client';
 
 describe('Cliente HTTP centralizado', () => {
+  it('não tenta ler JSON na exclusão 204 sem corpo', async () => {
+    const response = new Response(null, { status: 204 });
+    const json = vi.spyOn(response, 'json');
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(response));
+    await expect(apiWrite<void>('DELETE', '/players/1')).resolves.toBeUndefined();
+    expect(json).not.toHaveBeenCalled();
+  });
+
+  it('envia escrita JSON com o método e cabeçalho corretos', async () => {
+    const mock = vi.fn().mockResolvedValue(Response.json({ id: 1 }));
+
+    vi.stubGlobal('fetch', mock);
+    await apiWrite('PATCH', '/players/1/condition', { condition: 'DOENTE' });
+    expect(mock).toHaveBeenCalledWith('http://localhost:3000/api/v1/players/1/condition', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{"condition":"DOENTE"}',
+    });
+  });
+
   it('usa a origem configurada e o prefixo da API', async () => {
     const fetchMock = vi.fn().mockResolvedValue(Response.json({ data: [] }));
 
