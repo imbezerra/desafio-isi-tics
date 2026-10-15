@@ -82,7 +82,7 @@ As bibliotecas e os motivos de uso estão descritos nos READMEs do backend e do 
 
 ## Funcionalidades não implementadas
 
-O backend está implementado. No frontend, esta primeira etapa entrega a tela inicial e a consulta de jogadores com filtros, ordenação, paginação e estados de carregamento, vazio e erro. Ainda faltam cadastro, edição, condição e exclusão de jogadores; telas de clubes, compra, venda, histórico, escalação, partidas e classificação. O layout mobile não faz parte do escopo atual solicitado. Os itens de menu futuros estão identificados como “Em breve”, sem botões que simulem funcionalidades inexistentes.
+O backend está implementado. No frontend, estão disponíveis a tela inicial e o módulo de jogadores: consulta com filtros, ordenação, paginação e estados de carregamento, vazio e erro; cadastro com os sete indicadores; detalhes e edição dos quatro campos permitidos; alteração de condição; exclusão de jogador livre com confirmação. Os valores calculados são exibidos a partir da resposta da API, e as ações atualizam a lista e os contadores sem recarregar a página. Ainda faltam as telas de clubes, compra, venda, histórico/CSV, escalação, partidas e classificação. O layout mobile não faz parte do escopo atual solicitado. Os itens de menu futuros estão identificados como “Em breve”, sem botões que simulem funcionalidades inexistentes.
 
 ## Uso de inteligência artificial
 
