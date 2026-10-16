@@ -35,6 +35,10 @@ body:has(dialog[open]) {
   width: 480px;
 }
 
+.modal-receipt {
+  width: 500px;
+}
+
 .modal-drawer {
   width: 480px;
   height: 100svh;

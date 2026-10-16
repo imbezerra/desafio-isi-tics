@@ -25,6 +25,24 @@ function Example({ busy = false }: { busy?: boolean }) {
 }
 
 describe('Janela reutilizável', () => {
+  it('oferece uma variante de resultado sem alterar a identificação acessível', () => {
+    render(
+      <Modal
+        title="Resultado"
+        description="Dados devolvidos pela API"
+        variant="receipt"
+        onClose={() => {}}
+      >
+        <p>Operação concluída</p>
+      </Modal>,
+    );
+
+    const dialog = screen.getByRole('dialog', { name: 'Resultado' });
+
+    expect(dialog).toHaveClass('modal-receipt');
+    expect(dialog).toHaveAccessibleDescription('Dados devolvidos pela API');
+  });
+
   it('foca a entrada, permite cancelar e devolve o foco ao botão original', async () => {
     const user = userEvent.setup();
 

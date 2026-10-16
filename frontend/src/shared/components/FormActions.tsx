@@ -3,11 +3,13 @@ export function FormActions({
   onCancel,
   label,
   destructive = false,
+  icon,
 }: {
   pending: boolean;
   onCancel: () => void;
   label: string;
   destructive?: boolean;
+  icon?: string;
 }) {
   return (
     <footer className="form-actions">
@@ -19,7 +21,7 @@ export function FormActions({
         className={`button ${destructive ? 'button-destructive' : 'button-primary'}`}
         disabled={pending}
       >
-        {destructive && <Icon name="delete-white" />}
+        {(destructive || icon) && <Icon name={destructive ? 'delete-white' : icon!} />}
         {pending ? 'Enviando…' : label}
       </button>
     </footer>
