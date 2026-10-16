@@ -58,6 +58,10 @@ export function ClubPage() {
                 </span>
               </div>
             </div>
+            <Link className="button button-primary club-create" to="/players?free=true">
+              <Icon name="purchase-white" />
+              Comprar jogadores
+            </Link>
           </header>
           <ClubValues club={club} variant="summary">
             <div>
@@ -101,7 +105,7 @@ export function ClubPage() {
             no horário de Brasília (UTC−3). A multa tem teto de 10,00.
           </p>
           <p className="page-note">
-            Compra, venda, escalação e histórico serão disponibilizados nas próximas etapas.
+            Venda, escalação e histórico serão disponibilizados nas próximas etapas.
           </p>
         </>
       ) : null}

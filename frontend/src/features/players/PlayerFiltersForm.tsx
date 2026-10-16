@@ -16,11 +16,13 @@ const sortOptions = [
 export function PlayerFiltersForm({
   clubs,
   onApply,
+  initialValues = initialFilters,
 }: {
   clubs: Club[];
   onApply: (filters: PlayerFilters) => void;
+  initialValues?: PlayerFilters;
 }) {
-  const [filters, setFilters] = useState(initialFilters);
+  const [filters, setFilters] = useState(initialValues);
 
   function update(key: keyof PlayerFilters, value: string) {
     setFilters((current) => ({

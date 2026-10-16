@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router';
 import type { Player, Club } from '../../shared/api/contracts';
 import { AppShell } from '../../shared/components/AppShell';
 import { DataTable, type Column } from '../../shared/components/DataTable';
@@ -17,12 +18,17 @@ import { PlayerForm } from './PlayerForm';
 import { PlayerDialog } from './PlayerDialog';
 import { DeletePlayerDialog } from './DeletePlayerDialog';
 import { PlayerResult } from './PlayerResult';
+import { PurchaseDialog } from '../market/PurchaseDialog';
+import { PurchaseReceipt } from '../market/PurchaseReceipt';
+import type { PurchaseResult } from '../market/purchases.api';
 import './players.css';
 import './player-dialogs.css';
+import '../market/purchases.css';
 
 function createColumns(
   clubs: Club[],
   onSelect: (kind: PlayerAction, player: Player) => void,
+  onBuy: (player: Player) => void,
 ): Column<Player>[] {
   return [
     {
@@ -113,14 +119,32 @@ function createColumns(
       key: 'actions',
       label: 'Ações',
       render: (player) => (
-        <PlayerActions player={player} onSelect={(kind) => onSelect(kind, player)} />
+        <div className="player-row-actions">
+          {player.club_id === null && (
+            <button
+              type="button"
+              className="button button-outline player-buy"
+              aria-label={`Comprar ${player.name}`}
+              onClick={() => onBuy(player)}
+            >
+              <Icon name="purchase-player" />
+              Comprar
+            </button>
+          )}
+          <PlayerActions player={player} onSelect={(kind) => onSelect(kind, player)} />
+        </div>
       ),
     },
   ];
 }
 
 export function PlayersPage() {
-  const [filters, setFilters] = useState(initialFilters);
+  const [searchParams] = useSearchParams();
+  const [startingFilters] = useState(() => ({
+    ...initialFilters,
+    free: searchParams.get('free') === 'true' ? 'true' : '',
+  }));
+  const [filters, setFilters] = useState(startingFilters);
   const [page, setPage] = useState(1);
   const players = usePlayers(filters, page);
   const clubs = useClubs();
@@ -129,6 +153,16 @@ export function PlayersPage() {
     { kind: PlayerAction; player: Player } | { kind: 'create' }
   >();
   const [notice, setNotice] = useState<{ message: string; player?: Player }>();
+  const [buyingPlayer, setBuyingPlayer] = useState<Player>();
+  const [purchase, setPurchase] = useState<PurchaseResult>();
+
+  async function purchased(result: PurchaseResult) {
+    if (page > 1 && filters.free === 'true' && players.data?.data.length === 1) setPage(page - 1);
+    await queryClient.invalidateQueries();
+    setNotice(undefined);
+    setBuyingPlayer(undefined);
+    setPurchase(result);
+  }
 
   function select(kind: PlayerAction, player: Player) {
     setSelection({ kind, player });
@@ -207,7 +241,11 @@ export function PlayersPage() {
           </small>
         </section>
       )}
-      <PlayerFiltersForm clubs={clubs.data ?? []} onApply={applyFilters} />
+      <PlayerFiltersForm
+        clubs={clubs.data ?? []}
+        onApply={applyFilters}
+        initialValues={startingFilters}
+      />
       {clubs.isError && (
         <Message tone="error" onRetry={() => void clubs.refetch()}>
           {clubs.error.message}
@@ -222,7 +260,7 @@ export function PlayersPage() {
         </header>
         <DataTable
           label="Jogadores"
-          columns={createColumns(clubs.data ?? [], select)}
+          columns={createColumns(clubs.data ?? [], select, setBuyingPlayer)}
           rows={players.data?.data ?? []}
           getRowKey={(player) => player.id}
           loading={players.isPending}
@@ -244,6 +282,23 @@ export function PlayersPage() {
       <p className="page-note">
         Overall e valores são devolvidos pela API. A busca ignora maiúsculas, minúsculas e acentos.
       </p>
+      {buyingPlayer && (
+        <PurchaseDialog
+          playerId={buyingPlayer.id}
+          onClose={() => setBuyingPlayer(undefined)}
+          onSaved={purchased}
+        />
+      )}
+      {purchase && (
+        <PurchaseReceipt
+          result={purchase}
+          clubName={
+            clubs.data?.find((club) => club.id === purchase.club_id)?.name ??
+            `Clube #${purchase.club_id}`
+          }
+          onClose={() => setPurchase(undefined)}
+        />
+      )}
       {selection?.kind === 'create' && (
         <PlayerForm onClose={() => setSelection(undefined)} onSaved={saved} />
       )}
