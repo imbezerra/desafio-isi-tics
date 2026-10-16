@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { Link } from 'react-router';
+import { NavLink } from 'react-router';
 import { useOverview } from '../../features/overview/overview.queries';
 import { Icon } from './Icon';
 import { Logo } from './Logo';
@@ -9,10 +9,12 @@ export function AppShell({
   children,
   onRefresh,
   refreshing,
+  pageTitle = 'Jogadores',
 }: {
   children: ReactNode;
   onRefresh: () => void;
   refreshing: boolean;
+  pageTitle?: string;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const overview = useOverview();
@@ -25,14 +27,28 @@ export function AppShell({
           <Logo />
           <nav>
             <p className="nav-label">Mercado</p>
-            <Link className="nav-item active" to="/players" aria-current="page">
-              <Icon name="nav-players" />
-              Jogadores<span>{data?.playerCount ?? '–'}</span>
-            </Link>
-            <div className="nav-item pending">
-              <Icon name="nav-clubs" />
-              Clubes<small>Em breve</small>
-            </div>
+            <NavLink
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              to="/players"
+            >
+              {({ isActive }) => (
+                <>
+                  <Icon name={isActive ? 'nav-players' : 'nav-players-idle'} />
+                  Jogadores <span>{data?.playerCount ?? '–'}</span>
+                </>
+              )}
+            </NavLink>
+            <NavLink
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              to="/clubs"
+            >
+              {({ isActive }) => (
+                <>
+                  <Icon name={isActive ? 'nav-clubs-active' : 'nav-clubs'} />
+                  Clubes <span>{data?.clubs.length ?? '–'}</span>
+                </>
+              )}
+            </NavLink>
             <p className="nav-label">Liga</p>
             <div className="nav-item pending">
               <Icon name="nav-matches" />
@@ -106,7 +122,7 @@ export function AppShell({
             <span className="topbar-separator" />
             <span className="muted">Mercado</span>
             <Icon name="breadcrumb-next" />
-            <span>Jogadores</span>
+            <span>{pageTitle}</span>
             <button
               className="button button-icon refresh-button"
               aria-label="Atualizar dados"

@@ -1,0 +1,58 @@
+.club-list-toolbar {
+  align-items: center;
+  gap: 16px;
+}
+
+.club-list-toolbar .field {
+  width: 338px;
+}
+
+.club-count,
+.club-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.club-count {
+  white-space: nowrap;
+}
+
+.club-capacity,
+.club-acronym {
+  border-radius: 8px;
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+.club-capacity {
+  background: var(--muted);
+}
+
+.club-acronym,
+.club-crest {
+  border: 1px solid var(--border);
+}
+
+.club-crest {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  font-size: 12px;
+  background: var(--muted);
+}
+
+.clubs-table td {
+  padding: 12px 16px;
+}
+
+.clubs-table th {
+  padding: 12px 16px;
+}
+
+.club-name strong {
+  overflow-wrap: anywhere;
+}
