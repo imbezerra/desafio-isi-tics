@@ -398,6 +398,12 @@ td {
   color: var(--muted-foreground);
 }
 
+.sidebar-clubs-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .sidebar-club {
   display: flex;
   align-items: center;

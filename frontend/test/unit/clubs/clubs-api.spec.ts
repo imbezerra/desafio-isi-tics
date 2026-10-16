@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { getClubs } from '../../../src/features/clubs/clubs.api';
+import { createClub, getClubs } from '../../../src/features/clubs/clubs.api';
 import { club } from '../../fixtures/league.fixture';
 
 describe('Contrato HTTP de clubes', () => {
@@ -24,6 +24,18 @@ describe('Contrato HTTP de clubes', () => {
     await getClubs();
     expect(mock).toHaveBeenCalledWith('http://localhost:3000/api/v1/clubs?sort=name', {
       signal: undefined,
+    });
+  });
+
+  it('envia somente o contrato de criação, sem valores financeiros', async () => {
+    const mock = vi.fn().mockResolvedValue(Response.json(club, { status: 201 }));
+
+    vi.stubGlobal('fetch', mock);
+    expect(await createClub({ name: 'Águias FC', acronym: 'AGU' })).toEqual(club);
+    expect(mock).toHaveBeenCalledWith('http://localhost:3000/api/v1/clubs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{"name":"Águias FC","acronym":"AGU"}',
     });
   });
 });

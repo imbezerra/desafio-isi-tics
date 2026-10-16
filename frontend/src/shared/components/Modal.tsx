@@ -12,7 +12,7 @@ export function Modal({
 }: {
   title: string;
   description: string;
-  variant?: 'default' | 'wide' | 'small' | 'drawer';
+  variant?: 'default' | 'wide' | 'small' | 'drawer' | 'compact';
   busy?: boolean;
   onClose: () => void;
   children: ReactNode;

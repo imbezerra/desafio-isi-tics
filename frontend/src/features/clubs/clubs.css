@@ -1,3 +1,7 @@
+.club-create {
+  margin-left: auto;
+}
+
 .club-list-toolbar {
   align-items: center;
   gap: 16px;
@@ -55,4 +59,50 @@
 
 .club-name strong {
   overflow-wrap: anywhere;
+}
+
+.club-starting-cash {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--sidebar);
+  color: var(--muted-foreground);
+}
+
+.club-created {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.club-created > button {
+  align-self: flex-end;
+}
+
+.club-values {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.club-values > div {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.club-values dt {
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+
+.club-values dd {
+  margin: 6px 0 0;
+  font-size: 24px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }

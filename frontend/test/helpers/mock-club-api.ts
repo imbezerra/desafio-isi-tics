@@ -1,19 +1,35 @@
 import { vi } from 'vitest';
 import type { Club } from '../../src/shared/api/contracts';
+import type { CreateClubInput } from '../../src/features/clubs/clubs.api';
 import { club, playerList } from '../fixtures/league.fixture';
 
 export function mockClubApi({
   initial = [club],
   read,
+  create,
 }: {
   initial?: Club[];
   read?: (sort: string, clubs: Club[]) => Response | Promise<Response>;
+  create?: (input: CreateClubInput) => Response | Promise<Response> | undefined;
 } = {}) {
   const clubs = [...initial];
-  const mock = vi.fn(async (input: RequestInfo | URL): Promise<Response> => {
+  const mock = vi.fn(async (input: RequestInfo | URL, options?: RequestInit): Promise<Response> => {
     const url = new URL(String(input));
 
     if (url.pathname === '/api/v1/clubs') {
+      if (options?.method === 'POST') {
+        const body = JSON.parse(String(options.body)) as CreateClubInput;
+        const intercepted = create?.(body);
+
+        if (intercepted) return intercepted;
+
+        const created = { id: 99, ...body, cash: 300, squad_value: 0, net_worth: 300 };
+
+        clubs.push(created);
+
+        return Response.json(created, { status: 201 });
+      }
+
       return read?.(url.searchParams.get('sort') ?? '', clubs) ?? Response.json(clubs);
     }
 
@@ -29,5 +45,6 @@ export function mockClubApi({
 
   return {
     mock,
+    writes: () => mock.mock.calls.filter(([, options]) => options?.method === 'POST'),
   };
 }

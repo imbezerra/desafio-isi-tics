@@ -31,6 +31,10 @@ body:has(dialog[open]) {
   width: 460px;
 }
 
+.modal-compact {
+  width: 480px;
+}
+
 .modal-drawer {
   width: 480px;
   height: 100svh;

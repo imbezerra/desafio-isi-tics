@@ -10,11 +10,13 @@ export function AppShell({
   onRefresh,
   refreshing,
   pageTitle = 'Jogadores',
+  onCreateClub,
 }: {
   children: ReactNode;
   onRefresh: () => void;
   refreshing: boolean;
   pageTitle?: string;
+  onCreateClub?: () => void;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const overview = useOverview();
@@ -60,7 +62,18 @@ export function AppShell({
             </div>
           </nav>
           <section className="sidebar-clubs" aria-label="Clubes cadastrados">
-            <p className="nav-label">Clubes</p>
+            <div className="sidebar-clubs-heading">
+              <p className="nav-label">Clubes</p>
+              {onCreateClub && (
+                <button
+                  className="button button-icon"
+                  aria-label="Novo clube pelo menu"
+                  onClick={onCreateClub}
+                >
+                  <Icon name="club-sidebar-create" />
+                </button>
+              )}
+            </div>
             {overview.isPending ? (
               <small>Carregando clubes…</small>
             ) : overview.isError ? (
