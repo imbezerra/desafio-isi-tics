@@ -53,11 +53,13 @@ No Compose, a variável vem do `.env` da raiz e é passada como argumento de bui
 - `src/app/App.tsx`: rotas declarativas, link para pular ao conteúdo e página não encontrada.
 - `src/app/query-client.ts`: política de cache das consultas; sem novas tentativas automáticas.
 - `src/features/home/`: tela inicial do mockup, atalho Enter e explicação das seis etapas.
-- `src/features/overview/`: serviços e hooks de leitura dos contadores, clubes e resumo da liga.
+- `src/features/overview/`: serviço e hook de leitura dos contadores e resumo da liga, reutilizando a consulta do módulo de clubes.
+- `src/features/clubs/`: listagem e criação de clubes. `clubs.api.ts` concentra GET/POST e as opções de ordenação; `clubs.queries.ts` compartilha consultas por ordenação com os filtros de jogadores; `club-fields.ts` valida campos individuais e monta o corpo; `ClubForm` apresenta o cadastro; `ClubValues` mostra valores devolvidos pela API; `ClubsPage` coordena lista, mensagens e atualização.
 - `src/features/players/`: listagem, filtros, cadastro, detalhes, edição, condição e confirmação de exclusão. `players.api.ts` concentra o contrato HTTP; `players.queries.ts` controla as consultas; `player-fields.ts` define campos, validação simples e corpos permitidos. `PlayerForm` compartilha cadastro/edição; `PlayerConditionForm` e `DeletePlayerDialog` tratam as ações específicas; `PlayerDialog` carrega os detalhes atualizados; `PlayerResult`, `PlayerIdentity` e `PlayerIndicators` compartilham a apresentação. Componentes não fazem `fetch`.
 - `src/shared/api/`: cliente HTTP, erro centralizado e tipos dos campos consumidos da API.
 - `src/shared/components/`: tabela com carregamento/vazio/erro, paginação, campo com rótulo/erro, mensagens, janelas com `<dialog>` nativo, ações de formulário, ícones, marca e estrutura lateral reutilizáveis.
 - `src/shared/hooks/useAction.ts`: estado de escrita, mensagem de erro e bloqueio síncrono contra clique duplo, sem repetir pedidos automaticamente.
+- `src/shared/validation/text.ts`: normalização de espaços U+0020 compartilhada pelos formulários de jogadores e clubes, sem eliminar controles que a API precisa recusar.
 - `src/shared/formatters.ts`: apresentação de moedas e iniciais, sem cálculos de negócio.
 - `src/styles/`: tokens visuais e estilos compartilhados.
 - `public/assets/`: SVGs do Figma baixados para uso permanente local, com suas dimensões originais.
@@ -95,7 +97,7 @@ npm run build
 npm audit
 ```
 
-`npm test` usa `vitest run`: termina sozinho, sem observar arquivos. Há testes de tabela, filtros, paginação pela API, carregamento/vazio/erro, moedas, navegação e dos quatro fluxos de escrita de jogadores. Os testes conferem os onze campos do cadastro, os quatro permitidos na edição, confirmação da exclusão, respostas 204/404/409, preservação de filtros, valores exatos do servidor, clique duplo e bloqueio durante envio. Os pedidos são simulados; testes não criam nem apagam dados no banco da aplicação. O ambiente jsdom simula apenas abertura/fechamento de `<dialog>`; foco nativo, rolagem e disposição são conferidos no Chrome em 1366 × 768.
+`npm test` usa `vitest run`: termina sozinho, sem observar arquivos. Há testes de tabela, filtros, paginação pela API, carregamento/vazio/erro, moedas, navegação, dos quatro fluxos de escrita de jogadores e da listagem/criação de clubes. Os testes conferem os onze campos do cadastro de jogador, os quatro permitidos na edição, confirmação da exclusão, respostas 204/404/409, preservação de filtros, valores exatos do servidor, clique duplo e bloqueio durante envio. Em clubes, conferem as três ordenações enviadas à API, nome/sigla sem campos financeiros, mensagens de duplicidade/limite de clubes, falha de rede, atualização de contadores e opções do filtro de jogadores. Os pedidos são simulados; testes não criam nem apagam dados no banco da aplicação. O ambiente jsdom simula apenas abertura/fechamento de `<dialog>`; foco nativo, rolagem e disposição são conferidos no Chrome em 1366 × 768.
 
 `npm run format:check` executa ESLint e Prettier sem alterar arquivos, incluindo a checagem de linhas em branco. Para corrigir intencionalmente, `npm run format` aplica as correções automáticas do ESLint e depois o Prettier. A configuração usa dois espaços e finais de linha LF; `.editorconfig` orienta editores compatíveis e `.gitattributes` mantém LF também no checkout do Git, inclusive no Windows. Os testes de tooling verificam que o lint rejeita código sem as separações e que a correção é estável com o Prettier. Nos estilos, os blocos de seletores também ficam separados por uma linha em branco.
 
@@ -104,6 +106,8 @@ npm audit
 - A referência visual é a página “Telas · Desktop” da cópia autorizada do Figma. O foco atual é Chrome em 1366 × 768; mobile foi retirado do escopo solicitado, embora ainda conste como diferencial no barema.
 - A tela inicial é opcional no enunciado. Seus números vêm da API, não dos exemplos do mockup; líder só aparece quando há partidas gravadas.
 - A lista recebe dez jogadores por página. Filtros e ordenação são enviados à API, e a ordem e os valores devolvidos são preservados.
+- Clubes abrem ordenados por nome e permitem patrimônio crescente ou decrescente. A interface preserva a ordem do array da API e não soma valores financeiros. O cadastro envia somente nome e sigla, valida nome de 3 a 60 pontos de código e sigla com três letras maiúsculas de A a Z. Quantidade de palavras, formato do nome, relação entre nome/sigla, unicidade e limite da liga permanecem na API; mesmo com 20 clubes, o pedido pode ser enviado para exibir a recusa do servidor.
+- Depois da criação do clube, a confirmação mostra caixa, valor do elenco e patrimônio devolvidos pela API; lista, contadores e consultas usadas nos filtros de jogadores são atualizados, sem recarregar ou mudar a ordenação escolhida. A navegação de jogadores/clubes indica a rota ativa. A página de elenco/contratos ainda não está disponível; por isso esta etapa não exibe um botão de detalhes que leve a uma rota inexistente.
 - Os filtros têm rótulos visíveis. Vínculo, idade, valores e ordenação ficam em uma seção expansível; são aplicados pelo botão “Aplicar filtros”. Uma nova combinação volta à página 1.
 - Selecionar “Só livres” limpa e desabilita o clube, prevenção expressamente permitida pelo enunciado. Combinações de faixas contraditórias são enviadas e o `message` da API é mostrado.
 - O frontend não calcula overall, mercado, taxas, multas, patrimônio ou classificação. Formatar um número em pt-BR não altera a regra que o produziu.
@@ -117,9 +121,9 @@ npm audit
 
 ## Funcionalidades não implementadas
 
-Esta etapa cobre a base, tela inicial, módulo de jogadores e Docker completo: listagem, filtros, paginação, cadastro, detalhes/edição, alteração de condição e exclusão de jogador livre com confirmação. São os fluxos de F01 a F04; a pontuação só pode ser confirmada pela banca. Ainda faltam clubes, compra, venda, histórico/CSV, escalação, partidas e classificação. Itens futuros do menu são informativos, identificados como “Em breve”.
+Esta etapa cobre a base, tela inicial, módulo de jogadores, listagem/criação de clubes e Docker completo. São os fluxos de F01 a F05; a pontuação só pode ser confirmada pela banca. Ainda faltam a página do clube com elenco/contratos, compra, venda, histórico/CSV, escalação, partidas e classificação. Itens futuros do menu são informativos, identificados como “Em breve”.
 
-As alterações de jogadores serão revisadas em commits por responsabilidade, mediante aprovação do usuário. A próxima sequência funcional é: criação/listagem de clubes; página do clube; compra; venda; histórico; CSV; escalação; partidas; classificação; revisão final. O F4 exige pelo menos dez commits em `frontend/` e push em três dias distintos: commits locais não comprovam os dias de envio.
+As alterações são revisadas em commits por responsabilidade, mediante aprovação do usuário. A próxima sequência funcional é: página do clube; compra; venda; histórico; CSV; escalação; partidas; classificação; revisão final. O F4 exige pelo menos dez commits em `frontend/` e push em três dias distintos: commits locais não comprovam os dias de envio.
 
 Testes e lint/formatação atendem à estrutura dos respectivos diferenciais F5 quando os comandos passam; somam até 1,5 ponto. Sem o diferencial de responsividade, não se deve anunciar os 2 pontos completos de F5. O Compose atende à estrutura do diferencial Docker de B5 quando a lista abre pelo comando documentado.
 
