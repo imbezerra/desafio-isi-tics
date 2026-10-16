@@ -1,4 +1,4 @@
-import type { Club, Player, PlayerList } from '../../src/shared/api/contracts';
+import type { Club, ClubDetails, Player, PlayerList } from '../../src/shared/api/contracts';
 
 export const club: Club = {
   id: 7,
@@ -27,6 +27,25 @@ export const player: Player = {
   defending: 60,
   physical: 70,
   potential: 85,
+};
+
+export const clubDetails: ClubDetails = {
+  ...club,
+  cash: 51.58,
+  squad_value: 222.68,
+  net_worth: 274.26,
+  players: [
+    {
+      ...player,
+      club_id: club.id,
+      contract: {
+        purchase_value: 28.8,
+        loyalty_until: '2027-03-02T10:15:00-03:00',
+        remaining_days: 120,
+        penalty_rate: 10,
+      },
+    },
+  ],
 };
 
 export function playerList(

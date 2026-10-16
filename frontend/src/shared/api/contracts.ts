@@ -36,6 +36,21 @@ export interface Club {
   net_worth: number;
 }
 
+export interface PlayerContract {
+  purchase_value: number;
+  loyalty_until: string;
+  remaining_days: number;
+  penalty_rate: number;
+}
+
+export interface SquadPlayer extends Player {
+  contract: PlayerContract | null;
+}
+
+export interface ClubDetails extends Club {
+  players: SquadPlayer[];
+}
+
 export interface MatchSummary {
   id: number;
   home: { club_name: string; goals: number };

@@ -7,14 +7,22 @@ export function mockClubApi({
   initial = [club],
   read,
   create,
+  detail,
 }: {
   initial?: Club[];
   read?: (sort: string, clubs: Club[]) => Response | Promise<Response>;
   create?: (input: CreateClubInput) => Response | Promise<Response> | undefined;
+  detail?: (id: string) => Response | Promise<Response>;
 } = {}) {
   const clubs = [...initial];
   const mock = vi.fn(async (input: RequestInfo | URL, options?: RequestInit): Promise<Response> => {
     const url = new URL(String(input));
+
+    if (/^\/api\/v1\/clubs\/[^/]+$/.test(url.pathname))
+      return (
+        detail?.(decodeURIComponent(url.pathname.split('/').at(-1)!)) ??
+        Response.json({ ...club, players: [] })
+      );
 
     if (url.pathname === '/api/v1/clubs') {
       if (options?.method === 'POST') {
