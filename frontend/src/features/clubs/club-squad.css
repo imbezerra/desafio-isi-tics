@@ -1,0 +1,90 @@
+.club-squad .table-toolbar {
+  padding: 14px 16px;
+}
+
+.club-squad h2 {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+}
+
+.club-squad .table-toolbar p {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+
+.club-squad table {
+  min-width: 950px;
+}
+
+.club-squad td {
+  padding: 12px 8px;
+}
+
+.club-squad th {
+  padding: 10px 8px;
+  white-space: normal;
+}
+
+.club-squad th:first-child,
+.club-squad td:first-child {
+  padding-left: 16px;
+}
+
+.club-squad th:last-child,
+.club-squad td:last-child {
+  padding-right: 16px;
+}
+
+.squad-player {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 140px;
+}
+
+.squad-player strong {
+  overflow-wrap: anywhere;
+}
+
+.squad-player .avatar {
+  width: 32px;
+  height: 32px;
+}
+
+.contract-date {
+  white-space: nowrap;
+}
+
+.contract-date small {
+  display: block;
+}
+
+.contract-penalty {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.contract-penalty[data-rate='0'] {
+  color: #016630;
+  background: #f0fdf4;
+  border-color: #b9f8cf;
+}
+
+.contract-penalty[data-rate='5'],
+.contract-penalty[data-rate='10'] {
+  color: #9f5000;
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.contract-penalty[data-rate='20'] {
+  color: #bf000f;
+  background: #fef2f2;
+  border-color: #ffcaca;
+}
