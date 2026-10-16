@@ -7,7 +7,7 @@ import { Icon } from '../../shared/components/Icon';
 import { Message } from '../../shared/components/Message';
 import { Pagination } from '../../shared/components/Pagination';
 import { formatMoney, getInitials } from '../../shared/formatters';
-import { useClubs } from '../overview/overview.queries';
+import { useClubs } from '../clubs/clubs.queries';
 import { usePlayers } from './players.queries';
 import { initialFilters, type PlayerFilters } from './players.api';
 import { PlayerFiltersForm } from './PlayerFiltersForm';

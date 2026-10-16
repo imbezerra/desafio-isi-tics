@@ -1,4 +1,5 @@
 import type { Player, PlayerPosition } from '../../shared/api/contracts';
+import { normalizeTextSpaces } from '../../shared/validation/text';
 import type { CreatePlayerInput, EditPlayerInput } from './players.api';
 
 export const positions: Record<PlayerPosition, string> = {
@@ -41,7 +42,7 @@ export type PlayerFormValues = { name: string; position: PlayerPosition | '' } &
 export type PlayerFormErrors = Partial<Record<keyof PlayerFormValues, string>>;
 
 export function normalizePlayerName(value: string) {
-  return value.replace(/^ +| +$/g, '').replace(/ +/g, ' ');
+  return normalizeTextSpaces(value);
 }
 
 export function initialPlayerValues(player?: Player): PlayerFormValues {
