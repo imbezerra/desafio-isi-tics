@@ -409,6 +409,22 @@ td {
   align-items: center;
   gap: 8px;
   padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.sidebar-club.active {
+  background: var(--background);
+  border-color: var(--border);
+  box-shadow: var(--shadow-xs);
+  font-weight: 500;
+}
+
+.sidebar-club.active > span {
+  color: #fff;
+  background: var(--primary);
+  border-color: var(--primary);
 }
 
 .sidebar-club > span {
@@ -487,6 +503,14 @@ td {
   width: 1px;
   background: var(--border);
   margin: 0 4px;
+}
+
+.breadcrumb-link {
+  text-decoration: none;
+}
+
+.breadcrumb-link:hover {
+  text-decoration: underline;
 }
 
 .refresh-button {

@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { NavLink } from 'react-router';
+import { Link, NavLink } from 'react-router';
 import { useOverview } from '../../features/overview/overview.queries';
 import { Icon } from './Icon';
 import { Logo } from './Logo';
@@ -10,12 +10,14 @@ export function AppShell({
   onRefresh,
   refreshing,
   pageTitle = 'Jogadores',
+  parentPage,
   onCreateClub,
 }: {
   children: ReactNode;
   onRefresh: () => void;
   refreshing: boolean;
   pageTitle?: string;
+  parentPage?: { label: string; to: string };
   onCreateClub?: () => void;
 }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -82,10 +84,15 @@ export function AppShell({
               </Message>
             ) : data?.clubs.length ? (
               data.clubs.map((club) => (
-                <div className="sidebar-club" key={club.id}>
-                  <span>{Array.from(club.name)[0]}</span>
+                <NavLink
+                  className={({ isActive }) => `sidebar-club ${isActive ? 'active' : ''}`}
+                  key={club.id}
+                  to={`/clubs/${club.id}`}
+                  aria-label={`Abrir ${club.name}`}
+                >
+                  <span aria-hidden="true">{Array.from(club.acronym)[0]}</span>
                   {club.name}
-                </div>
+                </NavLink>
               ))
             ) : (
               <small>Nenhum clube cadastrado.</small>
@@ -135,6 +142,14 @@ export function AppShell({
             <span className="topbar-separator" />
             <span className="muted">Mercado</span>
             <Icon name="breadcrumb-next" />
+            {parentPage && (
+              <>
+                <Link className="muted breadcrumb-link" to={parentPage.to}>
+                  {parentPage.label}
+                </Link>
+                <Icon name="breadcrumb-next" />
+              </>
+            )}
             <span>{pageTitle}</span>
             <button
               className="button button-icon refresh-button"

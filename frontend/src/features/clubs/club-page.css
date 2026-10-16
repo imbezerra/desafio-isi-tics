@@ -1,0 +1,60 @@
+.club-heading > .club-crest {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.club-heading-badges,
+.club-heading-badges .club-acronym {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.club-heading-badges {
+  margin-top: 6px;
+}
+
+.club-tabs {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.club-tabs > button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 2px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  font-weight: 500;
+}
+
+.club-tabs > button[aria-selected='true'] {
+  border-bottom-color: var(--primary);
+}
+
+.club-tabs > button:disabled {
+  color: var(--muted-foreground);
+  opacity: 1;
+}
+
+.club-tabs > button > span {
+  padding: 1px 6px;
+  border-radius: 9px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 12px;
+}
+
+.club-load-error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}

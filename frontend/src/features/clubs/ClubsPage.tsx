@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { Link } from 'react-router';
 import type { Club } from '../../shared/api/contracts';
 import { AppShell } from '../../shared/components/AppShell';
 import { DataTable, type Column } from '../../shared/components/DataTable';
@@ -43,6 +44,20 @@ const columns: Column<Club>[] = [
     label: 'Patrimônio',
     numeric: true,
     render: (club) => <strong>{formatMoney(club.net_worth)}</strong>,
+  },
+  {
+    key: 'actions',
+    label: 'Ações',
+    render: (club) => (
+      <Link
+        className="button button-ghost club-view"
+        to={`/clubs/${club.id}`}
+        aria-label={`Ver clube ${club.name}`}
+      >
+        Ver clube
+        <Icon name="club-view" />
+      </Link>
+    ),
   },
 ];
 

@@ -2,6 +2,7 @@ import { Link, Route, Routes } from 'react-router';
 import { HomePage } from '../features/home/HomePage';
 import { PlayersPage } from '../features/players/PlayersPage';
 import { ClubsPage } from '../features/clubs/ClubsPage';
+import { ClubPage } from '../features/clubs/ClubPage';
 
 export function App() {
   return (
@@ -13,6 +14,7 @@ export function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/players" element={<PlayersPage />} />
         <Route path="/clubs" element={<ClubsPage />} />
+        <Route path="/clubs/:id" element={<ClubPage />} />
         <Route
           path="*"
           element={
