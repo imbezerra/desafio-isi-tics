@@ -10,19 +10,19 @@ export function parseBrasiliaDateTime(value: string): Date {
   }
 
   const [, year, month, day, hour, minute] = match;
-  const data = new Date(`${year}-${month}-${day}T${hour}:${minute}:00-03:00`);
+  const date = new Date(`${year}-${month}-${day}T${hour}:${minute}:00-03:00`);
 
   const expectedFormat = `${year}-${month}-${day}T${hour}:${minute}:00-03:00`;
-  if (Number.isNaN(data.getTime()) || formatBrasiliaDateTime(data) !== expectedFormat) {
+  if (Number.isNaN(date.getTime()) || formatBrasiliaDateTime(date) !== expectedFormat) {
     throw new BadRequestException('Data ou hora inexistente.');
   }
 
-  return data;
+  return date;
 }
 
-export function formatBrasiliaDateTime(data: Date): string {
+export function formatBrasiliaDateTime(date: Date): string {
   const parts = new Intl.DateTimeFormat('sv-SE', {
-    timeZone: 'America/Sao_Paulo',
+    timeZone: 'Etc/GMT+3',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -30,7 +30,7 @@ export function formatBrasiliaDateTime(data: Date): string {
     minute: '2-digit',
     second: '2-digit',
     hourCycle: 'h23',
-  }).formatToParts(data);
+  }).formatToParts(date);
   const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
 
   return `${values.year}-${values.month}-${values.day}T${values.hour}:${values.minute}:${values.second}-03:00`;
