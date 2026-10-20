@@ -10,7 +10,7 @@ export class ApiError extends Error {
 
 const apiOrigin = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
 
-async function request<T>(path: string, options: RequestInit): Promise<T> {
+async function request(path: string, options: RequestInit): Promise<Response> {
   let response: Response;
 
   try {
@@ -33,13 +33,25 @@ async function request<T>(path: string, options: RequestInit): Promise<T> {
     throw new ApiError(message, response.status);
   }
 
+  return response;
+}
+
+async function jsonRequest<T>(path: string, options: RequestInit): Promise<T> {
+  const response = await request(path, options);
+
   if (response.status === 204) return undefined as T;
 
   return response.json() as Promise<T>;
 }
 
 export function apiGet<T>(path: string, signal?: AbortSignal): Promise<T> {
-  return request<T>(path, { signal });
+  return jsonRequest<T>(path, { signal });
+}
+
+export async function apiGetFile(path: string, signal?: AbortSignal): Promise<Blob> {
+  const response = await request(path, { signal });
+
+  return response.blob();
 }
 
 export function apiWrite<T>(
@@ -47,7 +59,7 @@ export function apiWrite<T>(
   path: string,
   body?: unknown,
 ) {
-  return request<T>(path, {
+  return jsonRequest<T>(path, {
     method,
     ...(body === undefined
       ? {}
