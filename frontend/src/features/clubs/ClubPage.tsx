@@ -1,8 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { AppShell } from '../../shared/components/AppShell';
 import { Icon } from '../../shared/components/Icon';
 import { Message } from '../../shared/components/Message';
+import type { SquadPlayer } from '../../shared/api/contracts';
+import { SaleDialog } from '../market/SaleDialog';
+import { SaleReceipt } from '../market/SaleReceipt';
+import type { SaleResult } from '../market/sales.api';
 import { useClub } from './clubs.queries';
 import { ClubSquad } from './ClubSquad';
 import { ClubValues } from './ClubValues';
@@ -14,6 +19,14 @@ export function ClubPage() {
   const query = useClub(id);
   const client = useQueryClient();
   const club = query.data;
+  const [sellingPlayer, setSellingPlayer] = useState<SquadPlayer | null>(null);
+  const [sale, setSale] = useState<{ result: SaleResult; clubName: string } | null>(null);
+
+  async function sold(result: SaleResult) {
+    setSale({ result, clubName: club?.name ?? `Clube #${result.club_id}` });
+    setSellingPlayer(null);
+    await client.invalidateQueries();
+  }
 
   function refresh() {
     void client.invalidateQueries();
@@ -99,16 +112,27 @@ export function ClubPage() {
               Histórico <small>Em breve</small>
             </button>
           </div>
-          <ClubSquad players={club.players} onRefresh={refresh} />
+          <ClubSquad players={club.players} onRefresh={refresh} onSell={setSellingPlayer} />
           <p className="page-note">
             Valores, dias restantes e percentual de multa vêm da consulta atual à API. Datas e horas
             no horário de Brasília (UTC−3). A multa tem teto de 10,00.
           </p>
           <p className="page-note">
-            Venda, escalação e histórico serão disponibilizados nas próximas etapas.
+            Escalação e histórico serão disponibilizados nas próximas etapas.
           </p>
         </>
       ) : null}
+      {sellingPlayer && club && (
+        <SaleDialog
+          player={sellingPlayer}
+          club={club}
+          onClose={() => setSellingPlayer(null)}
+          onSaved={sold}
+        />
+      )}
+      {sale && (
+        <SaleReceipt result={sale.result} clubName={sale.clubName} onClose={() => setSale(null)} />
+      )}
     </AppShell>
   );
 }

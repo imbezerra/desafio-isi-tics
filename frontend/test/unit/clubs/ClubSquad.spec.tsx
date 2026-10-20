@@ -1,9 +1,19 @@
 import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { ClubSquad } from '../../../src/features/clubs/ClubSquad';
 import { clubDetails } from '../../fixtures/league.fixture';
 
 describe('Tabela reutilizável de elenco e contratos', () => {
+  it('oferece a venda por jogador quando a página fornece a ação', async () => {
+    const onSell = vi.fn();
+    const user = userEvent.setup();
+
+    render(<ClubSquad players={clubDetails.players} onRefresh={vi.fn()} onSell={onSell} />);
+    await user.click(screen.getByRole('button', { name: 'Vender João Silva' }));
+    expect(onSell).toHaveBeenCalledExactlyOnceWith(clubDetails.players[0]);
+  });
+
   it('apresenta valores, fidelidade e percentual recebidos da API', () => {
     render(<ClubSquad players={clubDetails.players} onRefresh={vi.fn()} />);
     const table = screen.getByRole('table', { name: 'Elenco' });

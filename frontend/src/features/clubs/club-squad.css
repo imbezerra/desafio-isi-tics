@@ -17,6 +17,12 @@
   min-width: 950px;
 }
 
+.squad-sell {
+  height: 32px;
+  padding: 0 12px;
+  gap: 6px;
+}
+
 .club-squad td {
   padding: 12px 8px;
 }

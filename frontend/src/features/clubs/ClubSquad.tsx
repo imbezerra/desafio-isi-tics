@@ -95,9 +95,11 @@ const columns: Column<SquadPlayer>[] = [
 export function ClubSquad({
   players,
   onRefresh,
+  onSell,
 }: {
   players: SquadPlayer[];
   onRefresh: () => void;
+  onSell?: (player: SquadPlayer) => void;
 }) {
   return (
     <section
@@ -118,7 +120,28 @@ export function ClubSquad({
       </header>
       <DataTable
         label="Elenco"
-        columns={columns}
+        columns={
+          onSell
+            ? [
+                ...columns,
+                {
+                  key: 'actions',
+                  label: 'Ações',
+                  render: (player) => (
+                    <button
+                      type="button"
+                      className="button button-outline squad-sell"
+                      aria-label={`Vender ${player.name}`}
+                      onClick={() => onSell(player)}
+                    >
+                      <Icon name="sale-player" />
+                      Vender
+                    </button>
+                  ),
+                },
+              ]
+            : columns
+        }
         rows={players}
         getRowKey={(player) => player.id}
         loading={false}
