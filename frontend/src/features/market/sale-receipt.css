@@ -1,0 +1,48 @@
+.modal-receipt:has(.sale-success-icon) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-receipt:has(.sale-success-icon) .modal-heading {
+  position: static;
+  margin-bottom: 0;
+}
+
+.modal-receipt:has(.sale-success-icon) > * {
+  flex-shrink: 0;
+}
+
+.modal-receipt:has(.sale-success-icon) .modal-close {
+  top: 11px;
+  right: 11px;
+}
+
+.sale-success-icon {
+  display: grid;
+  place-items: center;
+  align-self: flex-start;
+  order: -1;
+  padding: 8px;
+  border-radius: 50%;
+  background: #f0fdf4;
+}
+
+.sale-contract {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: var(--muted);
+  color: #18181b;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.sale-contract[data-status='RESCINDIDO'] {
+  border-color: #fee685;
+  background: #fffbeb;
+  color: #953d00;
+}
