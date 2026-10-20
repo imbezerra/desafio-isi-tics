@@ -7,13 +7,15 @@ export function Modal({
   description,
   variant = 'default',
   busy = false,
+  closeIcon = 'dialog-close',
   onClose,
   children,
 }: {
   title: string;
   description: string;
-  variant?: 'default' | 'wide' | 'small' | 'drawer' | 'compact' | 'receipt';
+  variant?: 'default' | 'wide' | 'small' | 'drawer' | 'compact' | 'receipt' | 'sale';
   busy?: boolean;
+  closeIcon?: string;
   onClose: () => void;
   children: ReactNode;
 }) {
@@ -58,7 +60,7 @@ export function Modal({
           disabled={busy}
           onClick={onClose}
         >
-          <Icon name="dialog-close" />
+          <Icon name={closeIcon} />
         </button>
       </header>
       {children}

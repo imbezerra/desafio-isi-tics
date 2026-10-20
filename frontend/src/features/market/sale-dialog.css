@@ -1,0 +1,31 @@
+.sale-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid #fee685;
+  border-radius: 10px;
+  color: #953d00;
+  background: #fffbeb;
+}
+
+.sale-warning .icon {
+  margin-top: 2px;
+}
+
+.sale-form .transaction-summary > div {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.sale-rules {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--sidebar);
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
