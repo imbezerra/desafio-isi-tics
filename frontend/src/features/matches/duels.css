@@ -1,0 +1,60 @@
+.duel-table table {
+  min-width: 950px;
+}
+
+.duel-table td {
+  vertical-align: middle;
+}
+
+.duel-player {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.duel-player > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.duel-player strong {
+  max-width: 180px;
+  overflow-wrap: anywhere;
+}
+
+.duel-player .avatar {
+  flex-shrink: 0;
+}
+
+.duel-value {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.duel-value small {
+  color: var(--muted-foreground);
+}
+
+.duel-value strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.duel-goal {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted-foreground);
+  background: var(--sidebar);
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.duel-goal[data-goal='true'] {
+  color: #016630;
+  border-color: #b9f8cf;
+  background: #f0fdf4;
+}
