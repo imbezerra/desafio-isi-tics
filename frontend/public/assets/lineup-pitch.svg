@@ -1,0 +1,15 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="286" height="364" viewBox="0 0 286 364" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Linhas">
+<path id="Linhas laterais e de fundo" d="M14 0V350H272V0" stroke-width="1.5" stroke="white" stroke-opacity="0.4"/>
+<rect id="Linha do meio" x="14" y="150.059" width="258" height="1.5" fill="white" fill-opacity="0.4"/>
+<circle id="C&#195;&#173;rculo central" cx="143" cy="150.809" r="34.7162" stroke="white" stroke-opacity="0.4" stroke-width="1.5"/>
+<circle id="Marca central" cx="143" cy="150.809" r="2" fill="white" fill-opacity="0.4"/>
+<rect id="Grande &#195;&#161;rea" x="66.5106" y="287.397" width="152.979" height="62.6029" stroke="white" stroke-opacity="0.4" stroke-width="1.5"/>
+<rect id="Pequena &#195;&#161;rea" x="108.246" y="329.132" width="69.5082" height="20.8676" stroke="white" stroke-opacity="0.4" stroke-width="1.5"/>
+<circle id="Marca do p&#195;&#170;nalti" cx="143" cy="308.265" r="1.75" fill="white" fill-opacity="0.4"/>
+<path id="Meia-lua" d="M115.26 287.4C121.81 278.68 132.09 273.55 143 273.55C153.91 273.55 164.19 278.68 170.74 287.4" stroke-width="1.5" stroke="white" stroke-opacity="0.4"/>
+<rect id="Gol" x="129.114" y="350" width="27.7729" height="7.58824" fill="white" fill-opacity="0.05" stroke="white" stroke-opacity="0.4" stroke-width="1.5"/>
+<path id="Escanteio esquerdo" d="M14 343C17.87 343 21 346.13 21 350" stroke-width="1.5" stroke="white" stroke-opacity="0.4"/>
+<path id="Escanteio direito" d="M265 350C265 346.13 268.13 343 272 343" stroke-width="1.5" stroke="white" stroke-opacity="0.4"/>
+</g>
+</svg>

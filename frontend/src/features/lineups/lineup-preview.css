@@ -1,0 +1,129 @@
+.lineup-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lineup-pitch-wrap {
+  padding: 16px;
+}
+
+.lineup-pitch {
+  position: relative;
+  width: 286px;
+  height: 360px;
+  border-radius: 10px;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 40px, rgb(255 255 255 / 5%) 40px 80px),
+    #0d542b;
+}
+
+.lineup-pitch-lines {
+  position: absolute;
+  top: -4px;
+  left: 0;
+}
+
+.lineup-marker {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transform: translateX(-50%);
+  max-width: 90px;
+}
+
+.lineup-avatar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 2px solid white;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
+}
+
+.lineup-avatar.lineup-vacant {
+  border-style: dashed;
+  background: rgb(255 255 255 / 10%);
+}
+
+.lineup-marker > small {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: white;
+  background: rgb(0 0 0 / 30%);
+  font-weight: 500;
+}
+
+.lineup-unfit-marker {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  top: -6px;
+  left: -6px;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid white;
+  border-radius: 50%;
+  background: #b55200;
+}
+
+.lineup-preview-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--sidebar);
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.lineup-reserves {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 20px;
+}
+
+.lineup-reserves .player-identity {
+  padding: 0;
+  gap: 10px;
+  border: 0;
+  border-radius: 0;
+  flex-wrap: nowrap;
+}
+
+.lineup-reserves .identity-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.lineup-reserves [data-sick='true'] {
+  opacity: 0.6;
+}
+
+.lineup-reserve-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--sidebar);
+  color: var(--muted-foreground);
+  font-size: 12px;
+}

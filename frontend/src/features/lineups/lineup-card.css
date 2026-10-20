@@ -1,0 +1,27 @@
+.lineup-card {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--background);
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+}
+
+.lineup-card-heading {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.lineup-card-heading h2 {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: -0.16px;
+}
+
+.lineup-card-heading p {
+  margin-top: 2px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 16px;
+}
