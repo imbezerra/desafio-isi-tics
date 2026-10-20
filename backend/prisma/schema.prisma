@@ -41,7 +41,7 @@ model Player {
 model Club {
   id             Int           @id @default(autoincrement())
   name           String        @map("nome") @db.VarChar(60)
-  normalizedName String        @unique @map("nome_normalizado") @db.VarChar(60)
+  normalizedName String        @unique @map("nome_normalizado") @db.Text
   acronym        String        @unique @map("sigla") @db.Char(3)
   cash           Decimal       @default(300.00) @map("caixa") @db.Decimal(10, 2)
   formation      String?       @map("formacao") @db.VarChar(5)

@@ -116,6 +116,19 @@ describe('API de clubes com PostgreSQL real', () => {
     expect((await request('/clubs/999')).status).toBe(404);
   });
 
+  it('aceita nome de 60 pontos de código mesmo quando minúsculas expandem o texto Unicode', async () => {
+    const name = `${'İ'.repeat(57)} FC`;
+    const club = await create(name, 'IFC');
+    const stored = await database.club.findUniqueOrThrow({ where: { id: club.id } });
+
+    expect([...name]).toHaveLength(60);
+    expect([...stored.normalizedName].length).toBeGreaterThan(60);
+    expect(stored.normalizedName).toBe(name.toLocaleLowerCase('pt-BR'));
+    expect((await request(`/clubs/${club.id}`)).data).toMatchObject({ name });
+    expect((await request('/clubs', 'POST', { name, acronym: 'IFC' })).status).toBe(409);
+    expect(await database.club.count()).toBe(1);
+  });
+
   it('aplica a definição de palavra e preserva a primeira letra Unicode na sigla', async () => {
     for (const name of ['Águias - .', 'Ω Águias']) {
       const response = await request('/clubs', 'POST', { name, acronym: 'AGU' });
