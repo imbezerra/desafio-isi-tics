@@ -18,6 +18,18 @@ export function mockClubApi({
   const mock = vi.fn(async (input: RequestInfo | URL, options?: RequestInit): Promise<Response> => {
     const url = new URL(String(input));
 
+    if (url.pathname.endsWith('/transactions'))
+      return Response.json({
+        data: [],
+        summary: {
+          total_spent: 0,
+          total_received: 0,
+          total_fees: 0,
+          total_penalties: 0,
+          total_profit: 0,
+        },
+      });
+
     if (/^\/api\/v1\/clubs\/[^/]+$/.test(url.pathname))
       return (
         detail?.(decodeURIComponent(url.pathname.split('/').at(-1)!)) ??

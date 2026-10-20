@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { Link, useParams, useSearchParams } from 'react-router';
 import { AppShell } from '../../shared/components/AppShell';
 import { Icon } from '../../shared/components/Icon';
 import { Message } from '../../shared/components/Message';
@@ -8,9 +8,11 @@ import type { SquadPlayer } from '../../shared/api/contracts';
 import { SaleDialog } from '../market/SaleDialog';
 import { SaleReceipt } from '../market/SaleReceipt';
 import type { SaleResult } from '../market/sales.api';
+import { ClubHistory } from '../market/history/ClubHistory';
 import { useClub } from './clubs.queries';
 import { ClubSquad } from './ClubSquad';
 import { ClubValues } from './ClubValues';
+import { ClubTabs, type ClubTab } from './ClubTabs';
 import './clubs.css';
 import './club-page.css';
 
@@ -19,6 +21,8 @@ export function ClubPage() {
   const query = useClub(id);
   const client = useQueryClient();
   const club = query.data;
+  const [params, setParams] = useSearchParams();
+  const activeTab: ClubTab = params.get('tab') === 'history' ? 'history' : 'squad';
   const [sellingPlayer, setSellingPlayer] = useState<SquadPlayer | null>(null);
   const [sale, setSale] = useState<{ result: SaleResult; clubName: string } | null>(null);
 
@@ -30,6 +34,26 @@ export function ClubPage() {
 
   function refresh() {
     void client.invalidateQueries();
+  }
+
+  function changeTab(tab: ClubTab) {
+    setParams(
+      (current) => {
+        const next = new URLSearchParams(current);
+
+        if (tab === 'history') next.set('tab', 'history');
+        else next.delete('tab');
+
+        return next;
+      },
+      { replace: true },
+    );
+  }
+
+  function openHistory() {
+    setSale(null);
+    changeTab('history');
+    document.getElementById('club-history-tab')?.focus();
   }
 
   return (
@@ -86,39 +110,19 @@ export function ClubPage() {
               <dd className="club-summary-hint">Limite de 12 jogadores</dd>
             </div>
           </ClubValues>
-          <div className="club-tabs" role="tablist" aria-label="Seções do clube">
-            <button
-              id="club-squad-tab"
-              type="button"
-              role="tab"
-              aria-selected="true"
-              aria-controls="club-squad"
-              onKeyDown={(event) => {
-                if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
-                  event.preventDefault();
-                  event.currentTarget.focus();
-                }
-              }}
-            >
-              <Icon name="club-tab-squad" />
-              Elenco <span>{club.players.length}</span>
-            </button>
-            <button type="button" role="tab" aria-selected="false" disabled>
-              <Icon name="club-tab-lineup" />
-              Escalação <small>Em breve</small>
-            </button>
-            <button type="button" role="tab" aria-selected="false" disabled>
-              <Icon name="club-tab-history" />
-              Histórico <small>Em breve</small>
-            </button>
-          </div>
-          <ClubSquad players={club.players} onRefresh={refresh} onSell={setSellingPlayer} />
+          <ClubTabs active={activeTab} squadCount={club.players.length} onChange={changeTab} />
+          {activeTab === 'history' ? (
+            <ClubHistory key={id} clubId={id} />
+          ) : (
+            <ClubSquad players={club.players} onRefresh={refresh} onSell={setSellingPlayer} />
+          )}
           <p className="page-note">
             Valores, dias restantes e percentual de multa vêm da consulta atual à API. Datas e horas
             no horário de Brasília (UTC−3). A multa tem teto de 10,00.
           </p>
           <p className="page-note">
-            Escalação e histórico serão disponibilizados nas próximas etapas.
+            A escalação será disponibilizada na próxima etapa. O histórico preserva os nomes e
+            valores do momento de cada operação.
           </p>
         </>
       ) : null}
@@ -131,7 +135,12 @@ export function ClubPage() {
         />
       )}
       {sale && (
-        <SaleReceipt result={sale.result} clubName={sale.clubName} onClose={() => setSale(null)} />
+        <SaleReceipt
+          result={sale.result}
+          clubName={sale.clubName}
+          onClose={() => setSale(null)}
+          onHistory={openHistory}
+        />
       )}
     </AppShell>
   );

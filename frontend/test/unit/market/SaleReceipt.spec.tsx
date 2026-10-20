@@ -18,6 +18,7 @@ describe('Comprovante da venda', () => {
         }}
         clubName="Águias FC"
         onClose={vi.fn()}
+        onHistory={vi.fn()}
       />,
     );
 
@@ -25,7 +26,7 @@ describe('Comprovante da venda', () => {
     expect(screen.getByText('Sem lucro: sem comissão')).toBeInTheDocument();
     expect(screen.getByText('Fidelidade cumprida: sem multa')).toBeInTheDocument();
     expect(screen.getByText('ENCERRADO')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Histórico em breve' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Ver histórico' })).toBeEnabled();
   });
 
   it('preserva valores sentinela, sem calcular lucro, multa, comissão, crédito ou caixa', () => {
@@ -45,6 +46,7 @@ describe('Comprovante da venda', () => {
         }}
         clubName="Águias FC"
         onClose={vi.fn()}
+        onHistory={vi.fn()}
       />,
     );
 

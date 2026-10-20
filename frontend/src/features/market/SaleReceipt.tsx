@@ -1,6 +1,6 @@
 import { Icon } from '../../shared/components/Icon';
 import { Modal } from '../../shared/components/Modal';
-import { formatMoney } from '../../shared/formatters';
+import { formatMoney, formatSignedMoney } from '../../shared/formatters';
 import type { SaleResult } from './sales.api';
 import { TransactionSummary } from './TransactionSummary';
 import './sale-receipt.css';
@@ -9,10 +9,12 @@ export function SaleReceipt({
   result,
   clubName,
   onClose,
+  onHistory,
 }: {
   result: SaleResult;
   clubName: string;
   onClose: () => void;
+  onHistory: () => void;
 }) {
   return (
     <Modal
@@ -45,7 +47,7 @@ export function SaleReceipt({
           },
           {
             label: 'Lucro',
-            value: `${result.profit > 0 ? '+' : ''}${formatMoney(result.profit)}`,
+            value: formatSignedMoney(result.profit),
             tone: result.profit > 0 ? 'positive' : result.profit < 0 ? 'negative' : undefined,
           },
           {
@@ -59,7 +61,7 @@ export function SaleReceipt({
           {
             label: 'Crédito no caixa',
             hint: 'Valor de venda − multa − comissão',
-            value: `${result.cash_change > 0 ? '+' : ''}${formatMoney(result.cash_change)}`,
+            value: formatSignedMoney(result.cash_change),
             emphasis: true,
           },
           {
@@ -85,14 +87,9 @@ export function SaleReceipt({
         ]}
       />
       <footer className="form-actions">
-        <button
-          type="button"
-          className="button button-outline"
-          disabled
-          title="O histórico será implementado na próxima etapa."
-        >
+        <button type="button" className="button button-outline" onClick={onHistory}>
           <Icon name="sale-history" />
-          Histórico em breve
+          Ver histórico
         </button>
         <button
           type="button"
