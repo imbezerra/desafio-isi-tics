@@ -6,9 +6,9 @@ import { FormActions } from '../../shared/components/FormActions';
 import { Icon } from '../../shared/components/Icon';
 import { Message } from '../../shared/components/Message';
 import { Modal } from '../../shared/components/Modal';
-import { formatMoney, getInitials } from '../../shared/formatters';
+import { formatMoney } from '../../shared/formatters';
 import { useAction } from '../../shared/hooks/useAction';
-import { positions } from '../players/player-fields';
+import { MarketPlayer } from './MarketPlayer';
 import { buyPlayer, type PurchaseResult } from './purchases.api';
 import {
   toPurchaseInput,
@@ -68,21 +68,7 @@ export function PurchaseForm({
       onClose={onClose}
     >
       <form ref={formRef} className="form-stack purchase-form" noValidate onSubmit={submit}>
-        <div className="purchase-player">
-          <span className="avatar" aria-hidden="true">
-            {getInitials(player.name)}
-          </span>
-          <div className="purchase-player-name">
-            <strong>{player.name}</strong>
-            <small>
-              {player.position} · {positions[player.position]} · {player.age} anos
-            </small>
-          </div>
-          <div className="purchase-market-value">
-            <small>Valor de mercado</small>
-            <strong>{formatMoney(player.market_value)}</strong>
-          </div>
-        </div>
+        <MarketPlayer player={player} />
         <fieldset className="form-fields" disabled={action.pending}>
           <legend className="sr-only">Dados da compra</legend>
           <Field id="purchase-club" label="Clube comprador" error={errors.clubId}>

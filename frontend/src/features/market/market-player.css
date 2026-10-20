@@ -1,0 +1,35 @@
+.market-player {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--sidebar);
+}
+
+.market-player-name {
+  flex: 1;
+  min-width: 0;
+}
+
+.market-player-name strong,
+.market-player-name small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.market-player small {
+  color: var(--muted-foreground);
+}
+
+.market-player-value {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  white-space: nowrap;
+}
+
+.market-player-value strong {
+  font-size: 16px;
+}
