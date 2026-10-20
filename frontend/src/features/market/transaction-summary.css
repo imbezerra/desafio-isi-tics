@@ -1,0 +1,58 @@
+.transaction-summary {
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.transaction-summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.transaction-summary > div:last-child {
+  border-bottom: 0;
+}
+
+.transaction-summary dt {
+  color: var(--muted-foreground);
+}
+
+.transaction-summary small {
+  display: block;
+  color: var(--muted-foreground);
+  font-weight: 400;
+}
+
+.transaction-summary dd {
+  margin: 0;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.transaction-summary-total {
+  background: var(--sidebar);
+}
+
+.transaction-summary-total dt,
+.transaction-summary-total dd {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.transaction-summary-total dd {
+  font-size: 16px;
+}
+
+.transaction-summary dd[data-tone='positive'] {
+  color: var(--success);
+}
+
+.transaction-summary dd[data-tone='negative'] {
+  color: #e40016;
+}
