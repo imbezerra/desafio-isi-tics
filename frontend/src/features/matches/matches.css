@@ -1,0 +1,55 @@
+.match-create {
+  margin-left: auto;
+}
+
+.latest-match h2 {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.match-history .table-toolbar {
+  align-items: center;
+  gap: 16px;
+}
+
+.match-history .table-toolbar h2,
+.duel-table .table-toolbar h2 {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.match-history .table-toolbar p,
+.duel-table .table-toolbar p {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.match-history .table-toolbar .field {
+  width: 220px;
+  flex-shrink: 0;
+}
+
+.match-history table {
+  min-width: 880px;
+}
+
+.match-history time {
+  white-space: nowrap;
+}
+
+.match-history .button {
+  min-height: 32px;
+  padding: 4px 8px;
+}
+
+.match-lineup-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.match-filter-error {
+  padding: 12px 16px;
+}
