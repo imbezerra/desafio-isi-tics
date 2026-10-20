@@ -27,5 +27,10 @@ export function useAction<TInput, TResult>(
     }
   }
 
-  return { submit, pending: mutation.isPending, error: mutation.error?.message };
+  return {
+    submit,
+    pending: mutation.isPending,
+    error: mutation.error?.message,
+    reset: mutation.reset,
+  };
 }

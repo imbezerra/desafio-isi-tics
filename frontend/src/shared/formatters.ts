@@ -21,6 +21,10 @@ export function formatMoney(value: number): string {
   return moneyFormatter.format(value);
 }
 
+export function formatSignedMoney(value: number): string {
+  return `${value > 0 ? '+' : ''}${formatMoney(value)}`;
+}
+
 export function formatBrasiliaDateTime(value: string) {
   const moment = new Date(value);
 

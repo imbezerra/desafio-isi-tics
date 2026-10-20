@@ -1,7 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { formatBrasiliaDateTime, formatMoney, getInitials } from '../../../src/shared/formatters';
+import {
+  formatBrasiliaDateTime,
+  formatMoney,
+  formatSignedMoney,
+  getInitials,
+} from '../../../src/shared/formatters';
 
 describe('Apresentação em português do Brasil', () => {
+  it.each([
+    [3.45, '+3,45'],
+    [-7.5, '-7,50'],
+    [0, '0,00'],
+  ])('apresenta o sinal do valor %s sem recalcular', (value, expected) => {
+    expect(formatSignedMoney(Number(value))).toBe(expected);
+  });
+
   it('formata moedas com duas casas e vírgula sem recalcular valores', () => {
     expect(formatMoney(1739.11)).toBe('1.739,11');
     expect(formatMoney(0)).toBe('0,00');
