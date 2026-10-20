@@ -1,14 +1,16 @@
 import { apiGet } from '../../shared/api/client';
-import type { MatchSummary, PlayerList, Standing } from '../../shared/api/contracts';
+import type { PlayerList } from '../../shared/api/contracts';
 import { getClubs } from '../clubs/clubs.api';
+import { getMatches } from '../matches/matches.api';
+import { getStandings } from '../standings/standings.api';
 
 export async function getOverview(signal: AbortSignal) {
   const [players, freePlayers, clubs, matches, standings] = await Promise.all([
     apiGet<PlayerList>('/players?limit=1', signal),
     apiGet<PlayerList>('/players?free=true&limit=1', signal),
     getClubs('name', signal),
-    apiGet<MatchSummary[]>('/matches', signal),
-    apiGet<Standing[]>('/standings', signal),
+    getMatches('', signal),
+    getStandings(signal),
   ]);
 
   return {

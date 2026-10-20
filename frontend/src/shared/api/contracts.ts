@@ -53,12 +53,29 @@ export interface ClubDetails extends Club {
 
 export interface MatchSummary {
   id: number;
-  home: { club_name: string; goals: number };
-  away: { club_name: string; goals: number };
+  played_at: string;
+  home: MatchTeam;
+  away: MatchTeam;
+  result: 'MANDANTE' | 'VISITANTE' | 'EMPATE';
+}
+
+export interface MatchTeam {
+  club_id: number;
+  club_name: string;
+  formation: string;
+  goals: number;
 }
 
 export interface Standing {
+  position: number;
   club_id: number;
   club_name: string;
+  played: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  goals_for: number;
+  goals_against: number;
+  goal_difference: number;
   points: number;
 }
