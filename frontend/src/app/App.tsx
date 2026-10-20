@@ -3,6 +3,9 @@ import { HomePage } from '../features/home/HomePage';
 import { PlayersPage } from '../features/players/PlayersPage';
 import { ClubsPage } from '../features/clubs/ClubsPage';
 import { ClubPage } from '../features/clubs/ClubPage';
+import { StandingsPage } from '../features/standings/StandingsPage';
+import { MatchesPage } from '../features/matches/MatchesPage';
+import { MatchPage } from '../features/matches/MatchPage';
 
 export function App() {
   return (
@@ -15,6 +18,9 @@ export function App() {
         <Route path="/players" element={<PlayersPage />} />
         <Route path="/clubs" element={<ClubsPage />} />
         <Route path="/clubs/:id" element={<ClubPage />} />
+        <Route path="/standings" element={<StandingsPage />} />
+        <Route path="/matches" element={<MatchesPage />} />
+        <Route path="/matches/:id" element={<MatchPage />} />
         <Route
           path="*"
           element={

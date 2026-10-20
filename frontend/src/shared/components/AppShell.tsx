@@ -56,14 +56,24 @@ export function AppShell({
               )}
             </NavLink>
             <p className="nav-label">Liga</p>
-            <div className="nav-item pending">
+            <NavLink
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              to="/matches"
+            >
               <Icon name="nav-matches" />
-              Partidas<small>Em breve</small>
-            </div>
-            <div className="nav-item pending">
-              <Icon name="nav-standings" />
-              Classificação<small>Em breve</small>
-            </div>
+              Partidas<span>{data?.matchCount ?? '–'}</span>
+            </NavLink>
+            <NavLink
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              to="/standings"
+            >
+              {({ isActive }) => (
+                <>
+                  <Icon name={isActive ? 'nav-standings-active' : 'nav-standings'} />
+                  Classificação
+                </>
+              )}
+            </NavLink>
           </nav>
           <section className="sidebar-clubs" aria-label="Clubes cadastrados">
             <div className="sidebar-clubs-heading">
