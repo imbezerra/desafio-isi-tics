@@ -42,6 +42,23 @@ describe('Consulta de jogadores', () => {
     });
   });
 
+  it('normaliza somente espaços U+0020 na busca', () => {
+    const params = new URLSearchParams(
+      buildPlayersQuery({ ...initialFilters, search: '  João   Silva  ' }, 1),
+    );
+
+    expect(params.get('search')).toBe('João Silva');
+  });
+
+  it.each(['\tJoão', 'João\t', '\u00a0João\u00a0'])(
+    'não remove caracteres diferentes de U+0020 na busca: %j',
+    (search) => {
+      expect(
+        new URLSearchParams(buildPlayersQuery({ ...initialFilters, search }, 1)).get('search'),
+      ).toBe(search);
+    },
+  );
+
   it.each(['true', 'false'])('não perde o filtro free=%s', (free) => {
     expect(new URLSearchParams(buildPlayersQuery({ ...initialFilters, free }, 1)).get('free')).toBe(
       free,

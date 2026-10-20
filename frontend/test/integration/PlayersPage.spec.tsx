@@ -101,4 +101,29 @@ describe('Listagem integrada à camada HTTP', () => {
       ),
     ).toBe(true);
   });
+
+  it('envia controle colado na busca e exibe a recusa da API, sem apagá-lo silenciosamente', async () => {
+    const user = userEvent.setup();
+    const fetchMock = mockApi((url) =>
+      url.searchParams.get('search')?.includes('\t')
+        ? Response.json({ message: 'search contém caractere de controle.' }, { status: 400 })
+        : Response.json(playerList()),
+    );
+
+    renderApp('/players');
+    await screen.findByText('João Silva');
+    await user.click(screen.getByLabelText('Buscar por nome'));
+    await user.paste('\tJoão');
+    await user.click(screen.getByRole('button', { name: 'Aplicar filtros' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'search contém caractere de controle.',
+    );
+
+    expect(
+      fetchMock.mock.calls.some(
+        ([input]) => new URL(String(input)).searchParams.get('search') === '\tJoão',
+      ),
+    ).toBe(true);
+  });
 });

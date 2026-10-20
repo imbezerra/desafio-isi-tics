@@ -1,5 +1,6 @@
 import { apiGet, apiWrite } from '../../shared/api/client';
 import type { Player, PlayerList, PlayerCondition } from '../../shared/api/contracts';
+import { normalizeTextSpaces } from '../../shared/validation/text';
 
 export type EditPlayerInput = Pick<Player, 'name' | 'position' | 'age' | 'agility'>;
 
@@ -58,7 +59,7 @@ export const initialFilters: PlayerFilters = {
 export function buildPlayersQuery(filters: PlayerFilters, page: number) {
   const query = new URLSearchParams({ page: String(page), limit: '10', sort: filters.sort });
   const values = {
-    search: filters.search.trim(),
+    search: normalizeTextSpaces(filters.search),
     position: filters.position,
     condition: filters.condition,
     free: filters.free,
