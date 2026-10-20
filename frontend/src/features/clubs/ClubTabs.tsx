@@ -1,7 +1,7 @@
 import type { KeyboardEvent } from 'react';
 import { Icon } from '../../shared/components/Icon';
 
-export type ClubTab = 'squad' | 'history';
+export type ClubTab = 'squad' | 'lineup' | 'history';
 
 export function ClubTabs({
   active,
@@ -48,9 +48,18 @@ export function ClubTabs({
         <Icon name="club-tab-squad" />
         Elenco <span>{squadCount}</span>
       </button>
-      <button type="button" role="tab" aria-selected="false" disabled>
+      <button
+        id="club-lineup-tab"
+        type="button"
+        role="tab"
+        aria-selected={active === 'lineup'}
+        aria-controls="club-lineup"
+        tabIndex={active === 'lineup' ? 0 : -1}
+        onClick={() => onChange('lineup')}
+        onKeyDown={navigate}
+      >
         <Icon name="club-tab-lineup" />
-        Escalação <small>Em breve</small>
+        Escalação
       </button>
       <button
         id="club-history-tab"

@@ -9,6 +9,7 @@ import { SaleDialog } from '../market/SaleDialog';
 import { SaleReceipt } from '../market/SaleReceipt';
 import type { SaleResult } from '../market/sales.api';
 import { ClubHistory } from '../market/history/ClubHistory';
+import { ClubLineup } from '../lineups/ClubLineup';
 import { useClub } from './clubs.queries';
 import { ClubSquad } from './ClubSquad';
 import { ClubValues } from './ClubValues';
@@ -22,7 +23,9 @@ export function ClubPage() {
   const client = useQueryClient();
   const club = query.data;
   const [params, setParams] = useSearchParams();
-  const activeTab: ClubTab = params.get('tab') === 'history' ? 'history' : 'squad';
+  const requestedTab = params.get('tab');
+  const activeTab: ClubTab =
+    requestedTab === 'history' || requestedTab === 'lineup' ? requestedTab : 'squad';
   const [sellingPlayer, setSellingPlayer] = useState<SquadPlayer | null>(null);
   const [sale, setSale] = useState<{ result: SaleResult; clubName: string } | null>(null);
 
@@ -41,7 +44,7 @@ export function ClubPage() {
       (current) => {
         const next = new URLSearchParams(current);
 
-        if (tab === 'history') next.set('tab', 'history');
+        if (tab !== 'squad') next.set('tab', tab);
         else next.delete('tab');
 
         return next;
@@ -113,6 +116,8 @@ export function ClubPage() {
           <ClubTabs active={activeTab} squadCount={club.players.length} onChange={changeTab} />
           {activeTab === 'history' ? (
             <ClubHistory key={id} clubId={id} />
+          ) : activeTab === 'lineup' ? (
+            <ClubLineup key={id} clubId={id} players={club.players} />
           ) : (
             <ClubSquad players={club.players} onRefresh={refresh} onSell={setSellingPlayer} />
           )}
@@ -121,8 +126,7 @@ export function ClubPage() {
             no horário de Brasília (UTC−3). A multa tem teto de 10,00.
           </p>
           <p className="page-note">
-            A escalação será disponibilizada na próxima etapa. O histórico preserva os nomes e
-            valores do momento de cada operação.
+            O histórico preserva os nomes e valores do momento de cada operação.
           </p>
         </>
       ) : null}

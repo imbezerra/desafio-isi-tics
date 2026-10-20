@@ -249,7 +249,7 @@ describe('Página do clube e contratos', () => {
     expect(screen.queryByRole('table', { name: 'Elenco' })).not.toBeInTheDocument();
   });
 
-  it('mantém a escalação desabilitada e navega por teclado entre elenco e histórico', async () => {
+  it('navega por teclado entre elenco, escalação e histórico', async () => {
     const api = mockClubApi();
     const user = userEvent.setup();
 
@@ -258,14 +258,16 @@ describe('Página do clube e contratos', () => {
 
     expect(tab).toHaveAttribute('aria-controls', 'club-squad');
     expect(screen.getByRole('tabpanel', { name: 'Elenco 0' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: 'Escalação Em breve' })).toBeDisabled();
+    expect(screen.getByRole('tab', { name: 'Escalação' })).toBeEnabled();
     expect(screen.getByRole('tab', { name: 'Histórico' })).toBeEnabled();
     tab.focus();
+    await user.keyboard('{ArrowRight}');
+    expect(await screen.findByRole('tabpanel', { name: 'Escalação' })).toBeInTheDocument();
     await user.keyboard('{ArrowRight}');
     expect(await screen.findByRole('tabpanel', { name: 'Histórico' })).toBeInTheDocument();
     await user.keyboard('{Home}');
     await waitFor(() => expect(tab).toHaveFocus());
     expect(api.writes()).toHaveLength(0);
-    expect(api.mock.mock.calls.some(([url]) => /lineup/.test(String(url)))).toBe(false);
+    expect(api.mock.mock.calls.some(([url]) => /lineup/.test(String(url)))).toBe(true);
   });
 });

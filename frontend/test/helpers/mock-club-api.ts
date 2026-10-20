@@ -18,6 +18,14 @@ export function mockClubApi({
   const mock = vi.fn(async (input: RequestInfo | URL, options?: RequestInit): Promise<Response> => {
     const url = new URL(String(input));
 
+    if (url.pathname.endsWith('/lineup'))
+      return Response.json({
+        club_id: Number(url.pathname.split('/').at(-2)),
+        formation: null,
+        complete: false,
+        players: [],
+      });
+
     if (url.pathname.endsWith('/transactions'))
       return Response.json({
         data: [],
