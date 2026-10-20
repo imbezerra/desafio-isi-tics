@@ -1,0 +1,113 @@
+.formation-picker {
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  border: 0;
+}
+
+.formation-picker {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.formation-picker legend {
+  float: left;
+  width: 100%;
+  padding: 0;
+  font-weight: 500;
+}
+
+.formation-picker > p {
+  clear: both;
+  padding-top: 2px;
+  margin-bottom: 10px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.formation-options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.formation-option {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.formation-option[data-selected='true'] {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+  background: var(--primary-soft);
+}
+
+.formation-option:focus-within {
+  outline: 3px solid #93c5fd;
+  outline-offset: 3px;
+}
+
+.formation-option > span:last-child {
+  min-width: 0;
+}
+
+.formation-option small {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted-foreground);
+}
+
+.formation-image {
+  width: 32px;
+  height: 42px;
+  flex-shrink: 0;
+}
+
+.formation-image > .icon {
+  transform: scale(0.8);
+  transform-origin: top left;
+}
+
+.formation-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.formation-radio {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--input-border);
+  border-radius: 50%;
+}
+
+.formation-radio input {
+  position: absolute;
+  inset: -1px;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.formation-radio .icon {
+  position: absolute;
+  left: -3px;
+  top: -2px;
+  pointer-events: none;
+}
+
+.formation-option[data-selected='true'] .formation-radio {
+  border-color: transparent;
+}
