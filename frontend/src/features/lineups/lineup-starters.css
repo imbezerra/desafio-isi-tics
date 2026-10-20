@@ -1,0 +1,52 @@
+.lineup-starters {
+  min-width: 680px;
+}
+
+.lineup-starters th,
+.lineup-starters td {
+  padding: 10px 8px;
+}
+
+.lineup-starters th:first-child,
+.lineup-starters td:first-child {
+  padding-left: 16px;
+}
+
+.lineup-starters td {
+  height: 60px;
+}
+
+.lineup-starters td:first-child small {
+  display: block;
+}
+
+.lineup-starters th:nth-child(2) {
+  width: 210px;
+}
+
+.lineup-starters .field label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.lineup-starters select {
+  background-image: url('/assets/history-chevron.svg');
+}
+
+.lineup-attributes {
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+
+.lineup-attributes > span {
+  display: block;
+  white-space: nowrap;
+}
+
+.lineup-attributes strong {
+  color: var(--foreground);
+}
