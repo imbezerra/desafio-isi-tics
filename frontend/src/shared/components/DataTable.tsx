@@ -4,6 +4,7 @@ import { Message } from './Message';
 export interface Column<T> {
   key: string;
   label: string;
+  shortLabel?: string;
   render: (row: T) => ReactNode;
   numeric?: boolean;
 }
@@ -65,8 +66,14 @@ export function DataTable<T>({
         <thead>
           <tr>
             {columns.map((column) => (
-              <th key={column.key} scope="col" className={column.numeric ? 'numeric' : ''}>
-                {column.label}
+              <th
+                key={column.key}
+                scope="col"
+                className={column.numeric ? 'numeric' : ''}
+                aria-label={column.shortLabel ? column.label : undefined}
+                title={column.shortLabel ? column.label : undefined}
+              >
+                {column.shortLabel ?? column.label}
               </th>
             ))}
           </tr>

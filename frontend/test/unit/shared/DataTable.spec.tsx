@@ -52,4 +52,19 @@ describe('Tabela reutilizável', () => {
     expect(rows[1]).toHaveTextContent('Zeca');
     expect(rows[2]).toHaveTextContent('Ana');
   });
+
+  it('abrevia o cabeçalho visual sem perder seu nome acessível', () => {
+    render(
+      <DataTable
+        {...defaults}
+        columns={[{ ...columns[0], label: 'Nome completo', shortLabel: 'Nome' }]}
+        rows={[{ id: 1, name: 'Ana' }]}
+      />,
+    );
+
+    const heading = screen.getByRole('columnheader', { name: 'Nome completo' });
+
+    expect(heading).toHaveTextContent('Nome');
+    expect(heading).toHaveAttribute('title', 'Nome completo');
+  });
 });

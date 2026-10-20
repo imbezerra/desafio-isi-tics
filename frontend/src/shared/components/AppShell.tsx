@@ -12,6 +12,7 @@ export function AppShell({
   pageTitle = 'Jogadores',
   parentPage,
   onCreateClub,
+  section = 'Mercado',
 }: {
   children: ReactNode;
   onRefresh: () => void;
@@ -19,6 +20,7 @@ export function AppShell({
   pageTitle?: string;
   parentPage?: { label: string; to: string };
   onCreateClub?: () => void;
+  section?: 'Mercado' | 'Liga';
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const overview = useOverview();
@@ -140,7 +142,7 @@ export function AppShell({
               <Icon name="panel-toggle" />
             </button>
             <span className="topbar-separator" />
-            <span className="muted">Mercado</span>
+            <span className="muted">{section}</span>
             <Icon name="breadcrumb-next" />
             {parentPage && (
               <>
