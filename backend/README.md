@@ -86,6 +86,12 @@ Os testes de escalação verificam as quatro formações, consulta vazia, ordena
 
 Partidas e classificação usam o exemplo da RN20 (Águias FC 1 × 2 Delta FC) como referência, compartilhado em `test/fixtures/league.fixture.ts`. Os testes verificam os seis duelos, redução de condição e arredondamento, empate sem gol, preservação de dados após edição/venda/exclusão, formações históricas, filtros, ordem, efeitos sobre a classificação, ausência de efeitos em caixa/elenco e rollback caso um duelo falhe. Os testes unitários de classificação reproduzem também o exemplo de seis clubes e quatro partidas da RN21.
 
+### Casos-limite da revisão final
+
+A integração verifica também as restrições diretamente no PostgreSQL: unicidade do nome normalizado e da sigla dos clubes e impedimento de escalar o mesmo jogador em dois clubes. O cadastro aceita nomes válidos com 60 pontos de código mesmo quando a conversão para minúsculas aumenta seu comprimento Unicode, como ocorre com `İ`. A coluna auxiliar `nome_normalizado` usa `TEXT`; o limite de 60 continua sendo validado sobre o nome original normalizado. Uma nova migration amplia somente essa coluna, sem apagar registros nem alterar a migration inicial.
+
+O parser e o formatador de datas usam UTC−3 fixo, conforme RN01, sem aplicar o horário de verão histórico de `America/Sao_Paulo`. Os testes incluem datas de 2018, virada do dia e meia-noite, preservando o instante recebido.
+
 ## Variáveis
 
 - `DATABASE_URL`: conexão PostgreSQL, usada pelo Prisma.

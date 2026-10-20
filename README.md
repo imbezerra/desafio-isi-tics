@@ -90,6 +90,14 @@ Partidas permitem escolher mandante e visitante e mostram placar e seis duelos h
 
 O layout mobile não faz parte do escopo atual solicitado. A fidelidade visual ao mockup não pontua; fluxos e informações obrigatórias são preservados, reutilizando os componentes existentes. A declaração de uso de IA será preenchida posteriormente.
 
+## Conferência final e entrega
+
+A revisão de 20/10/2026 confrontou a implementação com as regras e o barema de `docs/`. Passaram 174 testes unitários do backend, 59 testes HTTP com PostgreSQL exclusivo e 323 testes do frontend, além de build, lint e verificação de formatação. As auditorias npm de ambos os projetos não apontaram vulnerabilidades conhecidas na consulta dessa data.
+
+Em frontend de produção com API e banco descartáveis, foram exercitadas as nove ações da interface em 1366 × 768, incluindo bloqueio de clique duplo, histórico, CSV comparado byte a byte à API e partida com seis duelos. A criação do ambiente e o comando documentado de recriação do banco também foram conferidos nesse ambiente isolado. Esses testes não substituem os roteiros privados da banca nem garantem pontuação.
+
+Antes da entrega, ainda é necessário preencher a declaração de IA reservada abaixo, conferir o acesso público ao repositório sem login e os dias distintos de push de cada pasta, enviar os commits aprovados e informar o hash completo da versão final no e-mail, conforme o enunciado. Datas de commits locais não comprovam datas de push. O diferencial de responsividade mobile permanece fora do escopo solicitado e não é reivindicado.
+
 ## Uso de inteligência artificial
 
 Será preenchido posteriormente
