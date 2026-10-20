@@ -1,0 +1,47 @@
+.standings-table table {
+  min-width: 610px;
+}
+
+.standings-table th,
+.standings-table td {
+  padding: 12px 8px;
+}
+
+.standings-table th:first-child,
+.standings-table td:first-child {
+  width: 48px;
+  text-align: center;
+}
+
+.standings-table td:nth-child(2) {
+  min-width: 120px;
+}
+
+.standings-table td:last-child {
+  font-weight: 600;
+}
+
+.standing-position {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 4px;
+  border-radius: 6px;
+  background: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.standing-position[data-leader='true'] {
+  color: white;
+  background: var(--primary);
+}
+
+.standings-legend {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 16px;
+}

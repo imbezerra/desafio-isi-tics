@@ -1,0 +1,69 @@
+.recent-matches header,
+.standings-order header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.recent-matches h2,
+.standings-order h2 {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.recent-matches header p,
+.standings-order header p {
+  margin-top: 2px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+
+.recent-matches-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 20px;
+}
+
+.recent-match {
+  text-decoration: none;
+}
+
+.recent-match:hover {
+  text-decoration: underline;
+}
+
+.recent-match time {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+
+.recent-match > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.recent-match strong {
+  font-size: 13px;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+.recent-match strong[data-winner='true'] {
+  font-weight: 600;
+}
+
+.recent-match b {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--muted);
+  white-space: nowrap;
+}
+
+.recent-all {
+  color: var(--primary);
+  align-self: flex-start;
+  padding: 6px 8px;
+}
