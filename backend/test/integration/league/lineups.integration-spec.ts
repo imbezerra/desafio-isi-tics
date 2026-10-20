@@ -259,6 +259,22 @@ describe('escalações com PostgreSQL real', () => {
     expect(afterSale.players.map((j) => j.id)).not.toContain(players[4].id);
   });
 
+  it('impede o mesmo jogador em duas escalações por restrição do banco', async () => {
+    const { clubId, players } = await prepareSquad();
+    await setLineup(clubId, players.slice(0, 5));
+    const other = await request<{ id: number }>('/clubs', 'POST', {
+      name: 'Delta FC',
+      acronym: 'DFC',
+    });
+
+    expect(other.status).toBe(201);
+    await expect(
+      database.lineupEntry.create({ data: { clubId: other.data.id, playerId: players[0].id } }),
+    ).rejects.toMatchObject({ code: 'P2002' });
+    expect(await database.lineupEntry.count()).toBe(5);
+    expect((await request<LineupEntry>(`/clubs/${clubId}/lineup`)).data.complete).toBe(true);
+  });
+
   it('desfaz formação e exclusão dos titulares se a substituição falhar', async () => {
     const { clubId, players } = await prepareSquad();
     const original = (await setLineup(clubId, players.slice(0, 5))).data;

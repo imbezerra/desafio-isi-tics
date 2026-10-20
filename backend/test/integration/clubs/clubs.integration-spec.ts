@@ -105,6 +105,26 @@ describe('API de clubes com PostgreSQL real', () => {
     ).toBe(409);
   });
 
+  it('garante nome e sigla únicos no próprio banco, sem depender dos pipes', async () => {
+    await create('Águias FC', 'AGU');
+    await expect(
+      database.club.create({
+        data: { name: 'águias fc', normalizedName: 'águias fc', acronym: 'AFC' },
+      }),
+    ).rejects.toMatchObject({ code: 'P2002' });
+    await create('Aguias FC', 'AGI');
+    await expect(
+      database.club.create({
+        data: {
+          name: 'Aurora Grande União',
+          normalizedName: 'aurora grande união',
+          acronym: 'AGU',
+        },
+      }),
+    ).rejects.toMatchObject({ code: 'P2002' });
+    expect(await database.club.count()).toBe(2);
+  });
+
   it('lista e consulta clubes sem elenco', async () => {
     await create('Zebra Futebol Clube', 'ZFC');
     const eagles = await create('Águias Futebol Clube', 'AFC');
