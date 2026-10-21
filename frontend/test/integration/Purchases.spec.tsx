@@ -17,8 +17,10 @@ async function fillPurchase(user: ReturnType<typeof userEvent.setup>) {
   const dialog = await openPurchase(user);
 
   await user.selectOptions(within(dialog).getByLabelText('Clube comprador'), '7');
-  await user.type(within(dialog).getByLabelText('Data da fidelidade'), '02/03/2027');
-  await user.type(within(dialog).getByLabelText('Hora da fidelidade'), '10:15');
+  await user.type(within(dialog).getByLabelText('Data da fidelidade'), '02032027');
+  await user.type(within(dialog).getByLabelText('Hora da fidelidade'), '1015');
+  expect(within(dialog).getByLabelText('Data da fidelidade')).toHaveValue('02/03/2027');
+  expect(within(dialog).getByLabelText('Hora da fidelidade')).toHaveValue('10:15');
 
   return dialog;
 }

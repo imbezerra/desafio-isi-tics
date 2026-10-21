@@ -4,6 +4,7 @@ import type { Club, Player } from '../../shared/api/contracts';
 import { Field } from '../../shared/components/Field';
 import { FormActions } from '../../shared/components/FormActions';
 import { Icon } from '../../shared/components/Icon';
+import { MaskedInput } from '../../shared/components/MaskedInput';
 import { Message } from '../../shared/components/Message';
 import { Modal } from '../../shared/components/Modal';
 import { formatMoney } from '../../shared/formatters';
@@ -106,13 +107,12 @@ export function PurchaseForm({
             <Field id="purchase-date" label="Data da fidelidade" error={errors.date}>
               <div className="input-icon">
                 <Icon name="purchase-date" />
-                <input
+                <MaskedInput
                   id="purchase-date"
                   required
-                  inputMode="numeric"
-                  placeholder="DD/MM/AAAA"
+                  mask="date"
                   value={values.date}
-                  onChange={(event) => update('date', event.target.value)}
+                  onValueChange={(value) => update('date', value)}
                   aria-invalid={!!errors.date}
                   aria-describedby={errors.date ? 'purchase-date-error' : 'purchase-date-hint'}
                 />
@@ -121,13 +121,12 @@ export function PurchaseForm({
             <Field id="purchase-time" label="Hora da fidelidade" error={errors.time}>
               <div className="input-icon">
                 <Icon name="purchase-time" />
-                <input
+                <MaskedInput
                   id="purchase-time"
                   required
-                  inputMode="numeric"
-                  placeholder="HH:MM"
+                  mask="time"
                   value={values.time}
-                  onChange={(event) => update('time', event.target.value)}
+                  onValueChange={(value) => update('time', value)}
                   aria-invalid={!!errors.time}
                   aria-describedby={errors.time ? 'purchase-time-error' : 'purchase-date-hint'}
                 />
