@@ -124,7 +124,7 @@ Na revisão de 20/10/2026, incluindo a carga demonstrativa, passaram 184 testes 
 
 ## 🚧 Funcionalidades não implementadas
 
-Nenhuma funcionalidade obrigatória identificada no enunciado ficou pendente de implementação. O layout mobile não foi desenvolvido; o foco é desktop em 1366 × 768 e o diferencial de responsividade não é reivindicado. A fidelidade visual pixel a pixel ao Figma não é um objetivo desta versão.
+Nenhuma funcionalidade obrigatória identificada no enunciado ficou pendente de implementação. Conforme orientação posterior recebida, as telas mobile foram retiradas do escopo da versão final; esta implementação foi conferida em desktop, a 1366 × 768. A fidelidade visual pixel a pixel ao Figma não é um objetivo desta versão.
 
 ## 🤖 Uso de inteligência artificial
 

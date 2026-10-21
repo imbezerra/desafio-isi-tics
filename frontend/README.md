@@ -122,7 +122,7 @@ Foco nativo, rolagem e disposição foram conferidos no navegador em 1366 × 768
 
 ## 🚧 Funcionalidades não implementadas
 
-Os fluxos obrigatórios de F01 a F14 estão implementados. O layout mobile permanece fora do escopo desta versão; o diferencial de responsividade não é reivindicado. Outras limitações gerais estão no [README principal](../README.md).
+Os fluxos obrigatórios de F01 a F14 estão implementados. Conforme orientação posterior recebida, as telas mobile foram retiradas do escopo da versão final. A interface foi conferida em desktop, a 1366 × 768. Outras limitações gerais estão no [README principal](../README.md).
 
 ## 🤖 Uso de inteligência artificial
 
