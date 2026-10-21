@@ -100,8 +100,10 @@ export function AppShell({
                   to={`/clubs/${club.id}`}
                   aria-label={`Abrir ${club.name}`}
                 >
-                  <span aria-hidden="true">{Array.from(club.acronym)[0]}</span>
-                  {club.name}
+                  <span className="sidebar-club-badge" aria-hidden="true">
+                    {Array.from(club.acronym)[0]}
+                  </span>
+                  <span className="sidebar-club-name">{club.name}</span>
                 </NavLink>
               ))
             ) : (

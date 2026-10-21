@@ -15,6 +15,7 @@
 
 .club-list-toolbar .field {
   width: 338px;
+  max-width: 100%;
 }
 
 .club-count,
@@ -96,6 +97,7 @@
 }
 
 .club-values > div {
+  min-width: 0;
   padding: 16px;
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -111,4 +113,11 @@
   font-size: 24px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+@container page (max-width: 600px) {
+  .club-values {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

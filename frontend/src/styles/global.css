@@ -118,6 +118,7 @@ small {
   padding: 0;
   width: 32px;
   min-height: 32px;
+  flex-shrink: 0;
 }
 
 .logo {
@@ -195,6 +196,7 @@ small {
 .field label {
   font-size: 12px;
   font-weight: 500;
+  overflow-wrap: anywhere;
 }
 
 .field input,
@@ -222,6 +224,7 @@ small {
 
 .input-icon {
   position: relative;
+  min-width: 0;
 }
 
 .input-icon > .icon {
@@ -245,12 +248,17 @@ small {
 
 .table-toolbar {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
   justify-content: space-between;
   padding: 12px 16px;
   border-bottom: 1px solid var(--border);
 }
 
 .table-scroll {
+  min-width: 0;
+  max-width: 100%;
   overflow-x: auto;
 }
 
@@ -317,6 +325,7 @@ td {
 
 .pagination {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -347,7 +356,7 @@ td {
 }
 
 .sidebar {
-  width: 256px;
+  width: clamp(192px, 20vw, 256px);
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -378,6 +387,7 @@ td {
   border-radius: 8px;
   min-height: 32px;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .nav-item > span,
@@ -427,21 +437,27 @@ td {
   font-weight: 500;
 }
 
-.sidebar-club.active > span {
+.sidebar-club.active > .sidebar-club-badge {
   color: #fff;
   background: var(--primary);
   border-color: var(--primary);
 }
 
-.sidebar-club > span {
+.sidebar-club-badge {
   display: grid;
   place-items: center;
   width: 20px;
   height: 20px;
+  flex-shrink: 0;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--muted);
   font-size: 12px;
+}
+
+.sidebar-club-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .sidebar-footer {
@@ -459,6 +475,10 @@ td {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.sidebar-footer > div > span {
+  min-width: 0;
 }
 
 .sidebar-footer small {
@@ -488,6 +508,7 @@ td {
 }
 
 .app-panel {
+  container: page / inline-size;
   min-height: calc(100svh - 16px);
   background: #fff;
   border-radius: 14px;
@@ -554,7 +575,8 @@ td {
 }
 
 .page-content {
-  padding: 32px;
+  min-width: 0;
+  padding: clamp(16px, 2.4vw, 32px);
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -562,8 +584,15 @@ td {
 
 .page-heading {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 16px;
+}
+
+.page-heading > div {
+  flex: 1 1 240px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .page-heading p {
@@ -576,6 +605,7 @@ td {
   place-items: center;
   width: 48px;
   height: 48px;
+  flex-shrink: 0;
   background: var(--primary-soft);
   border: 1px solid var(--primary);
   border-radius: 12px;

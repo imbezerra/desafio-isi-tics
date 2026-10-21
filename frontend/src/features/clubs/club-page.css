@@ -13,6 +13,7 @@
 }
 
 .club-heading-badges {
+  flex-wrap: wrap;
   margin-top: 6px;
 }
 
@@ -21,6 +22,7 @@
   align-items: center;
   gap: 16px;
   border-bottom: 1px solid var(--border);
+  overflow-x: auto;
 }
 
 .club-tabs > button {
@@ -33,6 +35,8 @@
   border-bottom: 2px solid transparent;
   background: transparent;
   font-weight: 500;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .club-tabs > button[aria-selected='true'] {

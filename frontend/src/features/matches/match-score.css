@@ -28,6 +28,10 @@
   overflow-wrap: anywhere;
 }
 
+.match-team > div {
+  min-width: 0;
+}
+
 .match-team small {
   display: block;
   margin-top: 2px;
@@ -51,6 +55,7 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
 }
 
 .score {
@@ -80,4 +85,32 @@
   border-radius: 8px;
   font-size: 12px;
   white-space: nowrap;
+}
+
+@container page (max-width: 800px) {
+  .match-score {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .match-score-center {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .match-team {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .match-home {
+    flex-direction: column-reverse;
+  }
+
+  .match-score > .button {
+    grid-column: 1 / -1;
+    justify-self: center;
+  }
 }

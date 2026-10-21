@@ -40,3 +40,15 @@
   font-weight: 400;
   letter-spacing: normal;
 }
+
+@container page (max-width: 900px) {
+  .club-values.club-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container page (max-width: 480px) {
+  .club-values.club-summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

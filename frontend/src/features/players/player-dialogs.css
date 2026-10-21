@@ -346,3 +346,19 @@ meter::-webkit-meter-optimum-value {
   border-top: 1px solid var(--border);
   margin-top: 4px;
 }
+
+@media (max-width: 800px) {
+  .technical-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .position-options > div {
+    grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .indicator-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

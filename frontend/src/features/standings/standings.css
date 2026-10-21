@@ -47,3 +47,15 @@
   background: var(--muted);
   font-size: 12px;
 }
+
+@container page (max-width: 1000px) {
+  .standings-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .standings-sidebar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    align-items: start;
+  }
+}
