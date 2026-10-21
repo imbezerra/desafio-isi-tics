@@ -1,103 +1,137 @@
-# Liga fictícia de futebol
+# ⚽ Passe · Liga fictícia de futebol
 
-Aplicação do desafio descrito em [docs/README.md](docs/README.md). Os requisitos são consultados antes de implementar cada funcionalidade; a pontuação segue [docs/barema.md](docs/barema.md).
+Aplicação fullstack para administrar jogadores, clubes e o mercado de uma liga: da contratação com fidelidade à escalação, às partidas e à classificação.
 
-## Pré-requisitos
+![React](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![NestJS](https://img.shields.io/badge/NestJS-11-E0234E?logo=nestjs&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 
-- Docker Engine com Docker Compose v2, em execução. No Windows, Rancher Desktop com engine compatível com Docker.
-- Para desenvolvimento fora dos containers: Node.js 22.13 ou superior da linha 22 LTS e npm 10 ou superior.
-- PostgreSQL 16 é iniciado pela imagem pública `postgres:16-alpine`.
+[Backend](backend/README.md) · [Frontend](frontend/README.md) · [Enunciado](docs/README.md) · [Critérios de avaliação](docs/barema.md)
 
-## Instalação e execução no Ubuntu 24.04
+## ✨ Funcionalidades
 
-Na raiz do repositório:
+- **Jogadores:** cadastro, edição, condição física, exclusão lógica, indicadores, busca, filtros e paginação.
+- **Clubes:** criação, elenco, contratos e resumo financeiro, com ordenação por nome ou patrimônio.
+- **Mercado:** compra, venda, fidelidade, taxas, multas, comissões e histórico com filtros, totais e CSV.
+- **Liga:** quatro formações de cinco titulares, partidas com seis duelos históricos e classificação.
+
+## 🧰 Pré-requisitos
+
+- Docker Engine e Docker Compose v2 ou superior, em execução e utilizáveis sem `sudo` no Ubuntu 24.04.
+- Portas locais livres: `5173` (frontend), `3000` (API) e `5432` (banco).
+- Acesso à internet para baixar pacotes e imagens públicas de Node.js, Nginx e PostgreSQL 16.
+- **Somente para desenvolvimento fora dos containers:** Node.js 22 LTS, versão 22.13 ou superior da linha 22, e npm 10 ou superior.
+
+Ambiente Docker conferido: Engine 29.5.3 e Compose 5.1.4. As versões das imagens e dos pacotes estão nos Dockerfiles e lockfiles do projeto.
+
+No Windows, pode ser utilizado o Rancher Desktop com engine compatível com Docker. Os comandos abaixo são para Bash no Ubuntu 24.04; no PowerShell, use `Copy-Item` no lugar de `cp`.
+
+## 🚀 Instalação e execução
+
+Com o repositório já clonado, execute na **raiz**, em um ambiente novo:
 
 ```bash
 cp .env.example .env
 docker compose up -d --build
 ```
 
-A origem da API é `http://localhost:3000`. A base dos endpoints é `/api/v1`, a saúde está em `http://localhost:3000/api/v1/health` e o Swagger em `http://localhost:3000/docs`.
+O Compose constrói frontend e backend a partir deste repositório, inicia o PostgreSQL e aplica as migrations antes de iniciar a API. O banco novo começa **vazio**, sem carga automática. Os dois `package-lock.json` estão versionados e os builds usam `npm ci`.
 
-A interface está em `http://localhost:5173`. O Compose constrói e inicia frontend, API e banco com esse único comando. A API aplica as migrations antes de iniciar; o banco começa vazio, sem carga automática. O frontend usa build estático servido pelo Nginx, com suporte ao acesso direto às rotas, como `/players`.
+- **Frontend:** [http://localhost:5173](http://localhost:5173)
+- **Origem da API:** [http://localhost:3000](http://localhost:3000), com endpoints em `/api/v1`.
+- **Swagger:** [http://localhost:3000/docs](http://localhost:3000/docs)
+- **Saúde:** [http://localhost:3000/api/v1/health](http://localhost:3000/api/v1/health)
 
-Para acompanhar o ambiente:
+Para acompanhar os serviços, na raiz:
 
 ```bash
 docker compose ps
 docker compose logs backend
 ```
 
-Cada requisição concluída gera uma única linha pelo Logger do NestJS, com data/hora de Brasília, método, caminho e status final, inclusive nas recusas. Corpos e query strings não são registrados.
+O frontend de produção é servido pelo Nginx, incluindo acesso direto às rotas. Desenvolvimento local e verificações: [backend](backend/README.md) e [frontend](frontend/README.md).
 
-## Criação e recriação do banco
+## 🗄️ Criação e recriação do banco
 
-A criação inicial ocorre no primeiro comando de execução acima. Para recriar o banco da aplicação do zero, apagando seus registros e reaplicando as migrations, execute na raiz:
+A criação inicial ocorre no primeiro `docker compose up -d --build`, com as migrations de `backend/prisma/migrations/`. Um volume preserva os dados entre reinicializações.
+
+**Atenção: o comando abaixo apaga todos os registros da aplicação e reaplica as migrations.** Com os serviços em execução, use na raiz somente quando quiser recriar o banco do zero:
 
 ```bash
 docker compose exec backend npx prisma migrate reset --force
 ```
 
-Esse comando apaga os dados da aplicação. Não execute para apenas reiniciar o ambiente.
+Não é necessário recriar o banco para reiniciar ou atualizar o sistema.
 
-## Variáveis de ambiente
+### 🌱 Dados demonstrativos — opcional
 
-O arquivo `.env.example` da raiz contém as configurações locais do Compose: `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_PORT`, `BACKEND_PORT`, `FRONTEND_ORIGIN`, `FRONTEND_PORT` e `VITE_API_URL`. São valores de exemplo para desenvolvimento. `VITE_API_URL` é a origem da API vista pelo navegador, sem `/api/v1`, incorporada durante o build do frontend; não use o hostname interno `backend` nela. Ao mudar a porta da API, ajuste também essa origem. Ao mudar a porta da interface, ajuste `FRONTEND_ORIGIN` para manter o CORS restrito.
+A instalação e a recriação acima continuam deixando o banco vazio. Para demonstração manual, com o backend atualizado e um **banco sem registros**, execute na raiz:
 
-As portas padrão no host são `5432` para PostgreSQL e `3000` para a API. Se a porta `5432` já estiver ocupada, ajuste `POSTGRES_PORT` no seu `.env`; por exemplo, `5434`. Dentro da rede Docker, a conexão continua usando `db:5432`.
+```bash
+docker compose exec backend npm run seed:demo
+```
 
-Para executar a API fora do Docker e rodar verificações, consulte [backend/README.md](backend/README.md). O desenvolvimento e as verificações da interface estão em [frontend/README.md](frontend/README.md).
+A carga cria **2 clubes, 14 jogadores (10 contratados e 4 livres), 2 escalações completas e 1 partida com 6 duelos**. Inclui condições físicas variadas, contratos com fidelidade de 90 dias a partir da execução e histórico de compras e de uma venda com multa, lucro e comissão calculados pelos serviços existentes.
 
-## Estrutura de pastas e bibliotecas
+O comando nunca é executado na inicialização ou nas migrations. Recusa banco preenchido, inclusive com jogadores excluídos logicamente, sem apagar ou mesclar dados. A carga inteira usa uma transação: falhas desfazem suas gravações e uma segunda execução não duplica registros. Não execute outras ações durante a carga.
 
-- `backend/src/common/`: tipos, cálculos, normalização de texto, parsers e tratamento central de erros.
-- `backend/src/database/`: conexão Prisma.
-- `backend/src/players/`: módulo separado em controllers, DTOs, pipes, services, repositories, domínio, presenters e Swagger.
-- `backend/src/clubs/`: módulo de cadastro e consulta de clubes, com a mesma separação em camadas.
-- `backend/src/market/`: compra e venda de jogadores, contratos, taxas, multas, comissões, transações atômicas, histórico filtrado com totais e exportação CSV.
-- `backend/src/league/`: escalações, partidas com seis duelos históricos e classificação calculada.
-- `backend/test/unit/`: testes unitários organizados por área, espelhando os diretórios de `src/`.
-- `backend/test/integration/`: testes de integração HTTP organizados por módulo, com PostgreSQL exclusivo.
-- `backend/prisma/`: modelo de dados e migrations versionadas das sete tabelas obrigatórias.
-- `docs/`: enunciado, barema, glossário e exemplo de avaliação fornecidos para o desafio.
-- `frontend/src/app/`: roteamento e configuração das consultas.
-- `frontend/src/features/`: funcionalidades da interface, com tela, estilos, serviços HTTP e hooks separados.
-- `frontend/src/shared/`: contratos da API, cliente HTTP, componentes reutilizáveis e formatação.
-- `frontend/test/`: testes unitários e de integração de componentes, organizados por área.
-- `frontend/public/assets/`: SVGs locais extraídos do mockup, sem URLs temporárias.
+Esse recurso não tem pontuação específica e não é executado pela banca, que prepara seus próprios dados. Desenvolvimento local e testes da carga: [README do backend](backend/README.md).
 
-As bibliotecas e os motivos de uso estão descritos nos READMEs do backend e do frontend.
+## 🔐 Variáveis de ambiente
 
-## Decisões e premissas
+O [.env.example](.env.example) da raiz configura o Compose. As credenciais são exemplos de desenvolvimento, não credenciais de produção.
 
-- As regras monetárias usam precisão decimal e arredondamento somente no resultado final de cada cálculo.
-- O banco mantém os nomes em português exigidos; as respostas HTTP usam os nomes em inglês e snake_case do contrato.
-- Identificadores, classes, arquivos e pastas do backend e do frontend adotam inglês, com camelCase para funções/variáveis e PascalCase para tipos/classes/componentes. Os aliases do Prisma usam inglês com `@map`/`@@map`, preservando as tabelas e colunas em português exigidas pelo enunciado. Campos públicos e valores de lista da API permanecem exatamente como definidos; mensagens, documentação e commits continuam em português.
-- Arquitetura em camadas com Repository: controllers delegam ao serviço, serviços coordenam regras e transações, e repositories concentram o Prisma. Funções de domínio validam regras; pipes validam os formatos sem converter textos em números nos corpos JSON. A explicação de cada camada está no README do backend.
-- A exclusão de jogador é lógica. Registros históricos não são apagados.
-- Na listagem, o PostgreSQL aplica filtros persistidos. Busca Unicode, filtro de mercado e ordenação são feitos na API antes de paginar, reutilizando o cálculo central de mercado. Essa escolha evita duplicar a fórmula em SQL, mas consome memória proporcional aos jogadores candidatos. Para volumes elevados, essa etapa precisará migrar para consultas especializadas no banco.
-- Edição, condição, exclusão, compra, venda, escalação e partida usam transações com isolamento serializável. Não há repetição automática em conflito concorrente; compra, venda, escalação e partida retornam 409 nesse caso, e falhas inesperadas retornam 500 e desfazem a operação.
-- Partidas guardam os nomes, posições, condições, atributos usados, valores dos duelos, formações e placar do momento. As consultas não recalculam duelos com os dados atuais. A classificação é calculada pelos placares gravados, incluindo todos os clubes, e nunca persistida.
-- Os nomes são normalizados usando somente espaços U+0020; a comparação alfabética segue pontos de código Unicode, sem collation dependente do sistema.
+- `POSTGRES_DB=liga_futebol`: nome do banco da aplicação.
+- `POSTGRES_USER=liga_user` e `POSTGRES_PASSWORD=liga_password`: credenciais locais do PostgreSQL.
+- `POSTGRES_PORT=5432`: porta do banco no host; dentro do Docker permanece `db:5432`.
+- `BACKEND_PORT=3000`: porta pública da API; internamente ela escuta em `3000`.
+- `FRONTEND_PORT=5173`: porta pública do frontend; o Nginx escuta em `80` no container.
+- `FRONTEND_ORIGIN=http://localhost:5173`: única origem liberada pelo CORS da API.
+- `VITE_API_URL=http://localhost:3000`: origem pública da API vista pelo navegador, sem `/api/v1`.
 
-## Funcionalidades não implementadas
+Se uma porta estiver ocupada, ajuste o `.env` local. Mudar a porta da API exige ajustar `VITE_API_URL`; mudar a do frontend exige ajustar `FRONTEND_ORIGIN`. Como `VITE_API_URL` é incorporada no build, reconstrua o frontend após alterá-la. Não use o hostname interno `backend` nem coloque segredos nessa variável.
 
-Os fluxos obrigatórios do backend e de F01 a F14 do frontend estão implementados. Isso não representa garantia de nota: a revisão final e a avaliação da banca continuam necessárias.
+As variáveis específicas de desenvolvimento e testes estão nos READMEs do [backend](backend/README.md) e do [frontend](frontend/README.md).
 
-No frontend, jogadores têm filtros, ordenação, paginação, cadastro, detalhes, edição, condição e exclusão de livres. Clubes têm listagem, ordenação, criação e página com resumo financeiro, elenco e contratos. Compra e venda apresentam o resultado financeiro da API; o histórico combina filtros, totais e exportação CSV. A escalação oferece quatro formações, cinco vagas por setor, prévia e reservas, com aviso de escalação incompleta.
+## 📁 Estrutura e bibliotecas
 
-Partidas permitem escolher mandante e visitante e mostram placar e seis duelos históricos, com jogadores, condições, atributos, valores e gol recebidos da API. O histórico apresenta datas de Brasília, filtro por clube e acesso aos duelos. A classificação inclui todos os clubes e todas as colunas obrigatórias na ordem do servidor. As nove ações atualizam as consultas sem recarregar a página; as regras calculadas permanecem no backend.
+```text
+backend/    API NestJS, regras, persistência, migrations e testes
+frontend/   Interface React, funcionalidades, componentes e testes
+docs/       Enunciado, barema, glossário e exemplo de avaliação
+```
 
-O layout mobile não faz parte do escopo atual solicitado. A fidelidade visual ao mockup não pontua; fluxos e informações obrigatórias são preservados, reutilizando os componentes existentes. A declaração de uso de IA será preenchida posteriormente.
+- [Backend: estrutura, bibliotecas e responsabilidades](backend/README.md): NestJS, Prisma, Decimal.js, Jest e ferramentas de qualidade.
+- [Frontend: estrutura, bibliotecas e responsabilidades](frontend/README.md): React, Vite, React Router, TanStack Query e ferramentas de interface e testes.
 
-## Conferência final e entrega
+Cada README explica o motivo das dependências declaradas no respectivo `package.json`.
 
-A revisão de 20/10/2026 confrontou a implementação com as regras e o barema de `docs/`. Passaram 174 testes unitários do backend, 59 testes HTTP com PostgreSQL exclusivo e 323 testes do frontend, além de build, lint e verificação de formatação. As auditorias npm de ambos os projetos não apontaram vulnerabilidades conhecidas na consulta dessa data.
+## 🧭 Decisões e premissas
 
-Em frontend de produção com API e banco descartáveis, foram exercitadas as nove ações da interface em 1366 × 768, incluindo bloqueio de clique duplo, histórico, CSV comparado byte a byte à API e partida com seis duelos. A criação do ambiente e o comando documentado de recriação do banco também foram conferidos nesse ambiente isolado. Esses testes não substituem os roteiros privados da banca nem garantem pontuação.
+- Backend em camadas por módulo, com Repository; frontend organizado por funcionalidade e componentes compartilhados.
+- Regras de negócio e valores calculados ficam na API. A interface formata e apresenta as respostas, sem recalcular as regras; apenas soma valor e taxa no custo total, conforme permitido.
+- Identificadores internos em inglês; tabelas e colunas em português, com mapeamento Prisma. Campos públicos e enums seguem o contrato do desafio.
+- Precisão decimal para moedas e UTC−3 fixo para datas. Exclusão de jogador é lógica; transações e duelos preservam os dados do momento.
+- As decisões específicas, inclusive limites da estratégia de listagem, transações e cache, estão nas seções correspondentes dos READMEs técnicos.
 
-Antes da entrega, ainda é necessário preencher a declaração de IA reservada abaixo, conferir o acesso público ao repositório sem login e os dias distintos de push de cada pasta, enviar os commits aprovados e informar o hash completo da versão final no e-mail, conforme o enunciado. Datas de commits locais não comprovam datas de push. O diferencial de responsividade mobile permanece fora do escopo solicitado e não é reivindicado.
+## ✅ Verificações
 
-## Uso de inteligência artificial
+Os comandos de testes, lint, formatação, build e auditoria estão nos READMEs do [backend](backend/README.md) e do [frontend](frontend/README.md). Os testes terminam sozinhos, sem modo de observação; a verificação de formatação não altera arquivos.
 
-Será preenchido posteriormente
+Na revisão de 20/10/2026, incluindo a carga demonstrativa, passaram 184 testes unitários do backend, 65 testes de integração com PostgreSQL exclusivo e 335 testes do frontend. Os nove fluxos de escrita e o CSV foram conferidos também em ambiente descartável, com interface de produção em 1366 × 768. Isso não substitui os roteiros da banca nem garante pontuação.
+
+## 🚧 Funcionalidades não implementadas
+
+Nenhuma funcionalidade obrigatória identificada no enunciado ficou pendente de implementação. O layout mobile não foi desenvolvido; o foco é desktop em 1366 × 768 e o diferencial de responsividade não é reivindicado. A fidelidade visual pixel a pixel ao Figma não é um objetivo desta versão.
+
+## 🤖 Uso de inteligência artificial
+
+Utilizei o **Codex como principal ferramenta de desenvolvimento assistido** para acelerar a implementação e apoiar a análise do enunciado. A IA contribuiu de forma significativa para o código do backend e do frontend, os testes, a configuração do Docker e a documentação. Também utilizei integrações MCP e plugins do **Figma** para consultar as telas desktop e orientar a construção da interface.
+
+Meu papel foi definir o escopo, avaliar as propostas e acompanhar a implementação à luz das regras de negócio. Discuti alternativas de tecnologia antes de escolher NestJS, pedi uma separação mais clara das camadas do backend e dos testes, e avaliei a organização do frontend por funcionalidades. Sempre que uma solução parecia confusa ou distante da documentação, solicitei explicações e ajustes antes de seguir. Assim, aceitei sugestões como a centralização dos cálculos no backend e o uso de testes automatizados, alterei propostas de arquitetura e interface e descartei caminhos que não atendiam às decisões do projeto.
+
+Também usei a IA para **simular a avaliação da banca** com base no enunciado e no barema: revisar regras de negócio, conferir respostas da API, executar testes e verificar a instalação em um ambiente isolado. Na validação final, fiz testes manuais dos principais fluxos da aplicação e comparei o comportamento observado com o esperado. Essas verificações ajudaram a identificar pontos que precisavam de correção, sem substituir a avaliação oficial.
+
+Conduzi, portanto, um desenvolvimento assistido com decisões e validações sob minha responsabilidade. Pedi explicações sobre as mudanças para compreender e conseguir apresentar o projeto; **cada commit foi submetido à minha aprovação antes de ser criado**, e fiz manualmente os _pushes_ para o repositório remoto.
