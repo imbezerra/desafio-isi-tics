@@ -53,7 +53,6 @@ export function MatchesPage() {
   return (
     <AppShell
       pageTitle="Partidas"
-      section="Liga"
       refreshing={query.isFetching}
       onRefresh={() => void client.invalidateQueries()}
     >

@@ -20,7 +20,6 @@ export function MatchPage() {
     <AppShell
       pageTitle={`Partida #${id}`}
       parentPage={{ label: 'Partidas', to: backTo }}
-      section="Liga"
       refreshing={query.isFetching}
       onRefresh={() => void query.refetch()}
     >

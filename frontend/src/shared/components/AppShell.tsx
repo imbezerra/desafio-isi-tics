@@ -12,7 +12,6 @@ export function AppShell({
   pageTitle = 'Jogadores',
   parentPage,
   onCreateClub,
-  section = 'Mercado',
 }: {
   children: ReactNode;
   onRefresh: () => void;
@@ -20,7 +19,6 @@ export function AppShell({
   pageTitle?: string;
   parentPage?: { label: string; to: string };
   onCreateClub?: () => void;
-  section?: 'Mercado' | 'Liga';
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const overview = useOverview();
@@ -152,17 +150,27 @@ export function AppShell({
               <Icon name="panel-toggle" />
             </button>
             <span className="topbar-separator" />
-            <span className="muted">{section}</span>
-            <Icon name="breadcrumb-next" />
-            {parentPage && (
-              <>
-                <Link className="muted breadcrumb-link" to={parentPage.to}>
-                  {parentPage.label}
-                </Link>
-                <Icon name="breadcrumb-next" />
-              </>
-            )}
-            <span>{pageTitle}</span>
+            <nav className="breadcrumbs" aria-label="Caminho da página">
+              <ol>
+                <li>
+                  <Link className="muted breadcrumb-link" to="/">
+                    Início
+                  </Link>
+                </li>
+                {parentPage && (
+                  <li>
+                    <Icon name="breadcrumb-next" />
+                    <Link className="muted breadcrumb-link" to={parentPage.to}>
+                      {parentPage.label}
+                    </Link>
+                  </li>
+                )}
+                <li aria-current="page">
+                  <Icon name="breadcrumb-next" />
+                  <span title={pageTitle}>{pageTitle}</span>
+                </li>
+              </ol>
+            </nav>
             <button
               className="button button-icon refresh-button"
               aria-label="Atualizar dados"

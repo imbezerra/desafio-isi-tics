@@ -21,7 +21,6 @@ export function StandingsPage() {
   return (
     <AppShell
       pageTitle="Classificação"
-      section="Liga"
       refreshing={query.isFetching}
       onRefresh={() => void client.invalidateQueries()}
     >
