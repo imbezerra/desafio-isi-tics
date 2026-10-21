@@ -1,34 +1,34 @@
-# Backend da liga
+# ⚙️ Passe · Backend
 
-API NestJS, Node.js 22, TypeScript e PostgreSQL 16. Regras e contrato: [enunciado](../docs/README.md). Os seis endpoints de jogadores estão implementados sob `/api/v1/players`, o cadastro/consulta de clubes sob `/api/v1/clubs`, a compra em `POST /api/v1/players/{id}/buy` e a venda em `POST /api/v1/players/{id}/sell`.
+API REST em **NestJS 11, TypeScript, Node.js 22 e PostgreSQL 16**, seguindo as regras e o contrato de [docs/](../docs/README.md).
 
-O histórico está disponível em `GET /api/v1/clubs/{id}/transactions` e a exportação CSV em `GET /api/v1/clubs/{id}/transactions/export`. Ambos aceitam `type` (`COMPRA`, `VENDA` ou os dois separados por vírgula, sem espaços e sem repetição) e `player_id`. Exemplo: `/api/v1/clubs/1/transactions?type=VENDA&player_id=2`. O JSON inclui `data` e `summary`, com os totais dos mesmos registros filtrados. O CSV preserva essa ordem e usa UTF-8 sem BOM, separador `;`, vírgula decimal e LF inclusive na última linha.
+[Guia principal](../README.md) · [Frontend](../frontend/README.md) · [Barema](../docs/barema.md)
 
-A escalação é consultada em `GET /api/v1/clubs/{id}/lineup` e substituída em `PUT /api/v1/clubs/{id}/lineup`, com corpo como `{ "formation": "2-1-1", "player_ids": [1, 2, 3, 4, 5] }`. As formações aceitas são `3-1`, `2-2`, `2-1-1` e `1-2-1`. Os cinco ids devem ser distintos e incluir um goleiro, com os jogadores de linha distribuídos pelos setores da formação. Todos devem pertencer ao clube e estar APTO ou MAL_CONDICIONADO. A resposta traz `club_id`, `formation`, `complete` e `players` na ordem do elenco, sem alterar o caixa. Sem escalação, `formation` é nulo e `players` é vazio; ao perder um titular por doença ou venda, a formação é preservada e `complete` passa a falso.
+## 🧰 Pré-requisitos
 
-Para jogar, envie `POST /api/v1/matches` com `{ "home_club_id": 1, "away_club_id": 2 }`. Os clubes devem ser distintos e ter escalações completas. A resposta `201` inclui `Location`, o placar e os seis duelos registrados. `GET /api/v1/matches` lista partidas sem duelos, com filtro opcional `club_id`; `GET /api/v1/matches/{id}` traz todos os duelos. `GET /api/v1/standings` calcula a classificação de todos os clubes, inclusive os sem jogos, por pontos, saldo, gols marcados e nome.
+- Execução em containers: Docker Engine e Docker Compose v2 ou superior.
+- Desenvolvimento local: Node.js 22 LTS, versão 22.13 ou superior da linha 22, e npm 10 ou superior.
+- PostgreSQL 16, iniciado pelo Compose. Os comandos locais abaixo usam Bash no Ubuntu 24.04.
 
-## Execução com Docker
+## 🚀 Instalação e execução
 
-Siga a [execução na raiz](../README.md). A API em `http://localhost:3000` aplica migrations antes de iniciar, sem inserir dados de exemplo.
+### Opção principal: Docker
 
-## Logs HTTP
+Siga a [execução do README principal](../README.md). Ela sobe frontend, backend e banco, aplica as migrations e inicia a API em `http://localhost:3000`. Não é necessário instalar npm no host para essa opção.
 
-O Logger do NestJS registra uma linha por requisição concluída: data/hora de Brasília, método, caminho e status final. Exemplo do conteúdo: `2026-10-14T10:30:00-03:00 GET /api/v1/players 200`. O middleware é registrado antes do parser JSON e do CORS, incluindo recusas por JSON malformado, rotas inexistentes e preflight. Corpos e query strings ficam fora do log.
+### Alternativa: desenvolvimento local
 
-No Docker, execute `docker compose logs -f backend` na raiz; no desenvolvimento local, acompanhe o terminal de `npm run start:dev`. Os testes HTTP de `test/integration/common/` verificam uma chamada ao Logger por resposta, com os status 200, 400, 404, 409 e 204.
-
-## Desenvolvimento local no Ubuntu 24.04
-
-Na raiz, inicie o banco:
+Em um ambiente novo, na **raiz do repositório**, prepare somente o banco:
 
 ```bash
+cp .env.example .env
 docker compose up -d db
 ```
 
-Depois, na pasta `backend/`:
+Depois, a partir da raiz:
 
 ```bash
+cd backend
 cp .env.example .env
 npm ci
 npm run prisma:generate
@@ -36,137 +36,148 @@ npm run prisma:deploy
 npm run start:dev
 ```
 
-O `.env.example` usa PostgreSQL em `localhost:5432`. Caso a porta ou as credenciais do Compose sejam alteradas localmente, atualize `DATABASE_URL` no `.env` do backend para corresponder.
+O último comando mantém a API em execução com recompilação automática. A origem é `http://localhost:3000`, a base das rotas é `/api/v1` e o Swagger está em `http://localhost:3000/docs`; o documento OpenAPI está em `/docs-json`.
 
-Para recriar o banco de desenvolvimento do zero, apagando dados, na pasta `backend/`:
+Não execute a API local e o container de backend simultaneamente na porta `3000`. Se o banco do Compose usar outra porta ou credenciais, ajuste `DATABASE_URL` em `backend/.env` antes de aplicar as migrations.
+
+## 🗄️ Criação e recriação do banco
+
+`npm run prisma:deploy` aplica as migrations versionadas ao PostgreSQL iniciado pelo Compose. Não há seed automático: o banco novo começa vazio.
+
+**Somente para apagar os registros e recriar o banco de desenvolvimento**, com o banco em execução, dentro de `backend/`:
 
 ```bash
 npm run prisma:reset
 ```
 
-## Verificações
+Para a execução inteiramente em Docker, utilize o [comando de recriação da raiz](../README.md). Não edite migrations já aplicadas; evoluções do schema recebem uma nova migration.
 
-Na pasta `backend/`:
+### 🌱 Carga demonstrativa — opcional
+
+Com as migrations aplicadas e um **banco vazio**, dentro de `backend/`, no desenvolvimento local:
 
 ```bash
 npm run build
-npm run lint
-npm run format:check
-npm test
+npm run seed:demo
 ```
 
-Os testes unitários ficam em `test/unit/`, organizados por área: `common/`, `players/`, `clubs/`, `market/` e `league/`. Essas áreas espelham os diretórios de `src/`; `tooling/` verifica a compatibilidade das ferramentas de teste. O Jest procura os arquivos `*.spec.ts` somente nessa pasta. O comando termina sozinho e inclui os exemplos de valor de mercado RN02–RN05.
+No Docker, após construir e iniciar os serviços atualizados, execute na **raiz**:
 
-Os testes usam Jest 30, `@types/jest` 30 e `ts-jest` 29.4.14 ou superior na linha 29, que declara suporte ao Jest 30. A numeração principal do transformador não precisa ser igual à do executor. O [guia de migração do Jest](https://jestjs.io/docs/upgrading-to-jest30) orienta a revisão de tipos, matchers e configuração; o projeto mantém a separação entre testes unitários e de integração e a execução sem modo de observação.
+```bash
+docker compose exec backend npm run seed:demo
+```
 
-## Testes de integração
+São criados 2 clubes com 5 titulares cada, 4 jogadores livres, 11 contratos, 12 transações (11 compras e 1 venda), 2 escalações `2-1-1` e 1 partida com 6 duelos. As fidelidades usam uma data relativa de 90 dias. Um jogador comprado doente passa pelas transições permitidas de recuperação e é vendido, demonstrando multa, lucro e comissão, sem manipular valores financeiros.
 
-Os testes em `test/integration/` fazem requisições HTTP contra NestJS usando PostgreSQL real. Ficam separados por módulo, em `test/integration/players/`, `test/integration/clubs/`, `test/integration/market/` e `test/integration/league/`. Exigem um banco exclusivo terminado em `_test` e limpam suas tabelas a cada caso; nunca aponte para um banco com dados que você queira preservar.
+`src/demo/demo.data.ts` define entradas fictícias; `demo.seed.ts` reutiliza pipes, serviços e repositories dos módulos. `demo.repository.ts` confere as sete tabelas e envolve toda a carga numa transação serializável; `demo.runner.ts` é a entrada exclusiva do comando, carrega o `.env` local quando existe e encerra a conexão. Não há novas dependências, variáveis obrigatórias ou endpoints.
 
-Na raiz, com o serviço `db` em execução, crie o banco de testes uma vez:
+Banco preenchido ou falha retorna código de saída diferente de zero. Repetir a carga não altera os registros existentes; jogadores excluídos também impedem a execução. A carga não apaga dados e falhas não deixam registros parciais. Não faça outras ações durante sua execução. Ela não faz parte da inicialização, do reset ou da preparação da banca e não tem pontuação específica no barema.
+
+## 🔐 Variáveis de ambiente
+
+Copie [backend/.env.example](.env.example) para `backend/.env` no desenvolvimento local:
+
+- `DATABASE_URL`: conexão Prisma. Exemplo local: `postgresql://liga_user:liga_password@localhost:5432/liga_futebol?schema=public`.
+- `PORT=3000`: porta HTTP do processo NestJS.
+- `FRONTEND_ORIGIN=http://localhost:5173`: única origem liberada pelo CORS.
+- `TEST_DATABASE_URL`: conexão exclusiva dos testes HTTP, com banco terminado em `_test`; é fornecida no comando de testes, não usada pela aplicação.
+
+No Docker, o Compose monta `DATABASE_URL` usando `db:5432`, define `PORT=3000` e recebe as demais configurações do [.env.example da raiz](../.env.example). Nunca use o banco da aplicação em `TEST_DATABASE_URL`: a suíte limpa as tabelas entre os casos.
+
+## 📁 Estrutura e responsabilidades
+
+```text
+prisma/           Schema, mapeamentos e migrations das sete tabelas
+src/common/       Cálculos, parsers, ordenação, erros e logs compartilhados
+src/database/     Conexão e ciclo de vida do Prisma
+src/demo/         Carga demonstrativa opcional, isolada da inicialização
+src/players/      Cadastro, consulta, edição, condição e exclusão lógica
+src/clubs/        Cadastro, consulta, elenco e resumo financeiro
+src/market/       Compra, venda, contratos, histórico e CSV
+src/league/       Escalação, partidas, duelos históricos e classificação
+src/health/       Verificação de saúde com consulta ao banco
+test/unit/        Testes unitários por área de src/
+test/integration/ Testes HTTP com PostgreSQL real e exclusivo
+test/fixtures/    Dados compartilhados somente pelos testes
+```
+
+Os módulos separam `controllers/` (HTTP), `dto/` e `pipes/` (contratos e validação), `services/` (casos de uso), `domain/` (regras), `repositories/` (Prisma e transações) e `presenters/` (respostas). `swagger/` reúne a documentação auxiliar. Controllers não acessam o banco nem calculam regras.
+
+### Bibliotecas e motivos de uso
+
+- **NestJS:** `@nestjs/common`, `@nestjs/core` e `@nestjs/platform-express` fornecem módulos, injeção de dependências e HTTP; `@nestjs/config` carrega o `.env`; `@nestjs/swagger` documenta a API.
+- **Prisma:** `@prisma/client` executa consultas parametrizadas e transações; a CLI `prisma` gera o cliente e aplica migrations.
+- **`decimal.js`:** precisão e arredondamento explícitos dos cálculos monetários.
+- **`class-validator` e `class-transformer`:** infraestrutura do `ValidationPipe`; pipes próprios implementam os formatos estritos do contrato, sem coerção dos números JSON.
+- **`reflect-metadata` e `rxjs`:** infraestrutura de metadados e execução do NestJS.
+- **`jest`, `ts-jest` e `@nestjs/testing`:** testes TypeScript e inicialização da API de integração. `@types/jest`, `@types/node` e `@types/express` fornecem os tipos utilizados.
+- **ESLint:** `eslint`, `@eslint/js`, `@eslint/eslintrc`, `typescript-eslint` e `globals` verificam o código; `eslint-config-prettier` e `eslint-plugin-prettier` integram a formatação.
+- **`prettier`:** padroniza a formatação, com comando separado de verificação.
+- **TypeScript e ferramentas Nest:** `typescript`, `@nestjs/cli`, `@nestjs/schematics`, `ts-node`, `ts-loader` e `source-map-support` permitem compilar, desenvolver e depurar.
+
+As versões exatas estão no `package-lock.json`. Overrides restritos no `package.json` corrigem dependências transitivas de Swagger, Prisma e ferramentas de cobertura. O teste `test/unit/tooling/nyc-config.compatibility.spec.ts` verifica o carregador real de configuração de cobertura.
+
+## 🧭 Decisões e premissas
+
+- **Arquitetura em camadas com Repository:** serviços coordenam operações e repositories concentram o Prisma. Não é Clean Architecture completa: registros tipados pelo ORM atravessam a fronteira do repository; as regras de domínio permanecem independentes.
+- **Persistência:** `@map` e `@@map` preservam os nomes físicos em português, com identificadores internos em inglês. Nome normalizado e sigla de clube são únicos; um jogador só pode estar em uma escalação. A chave auxiliar Unicode usa `TEXT`, sem retirar o limite de 60 pontos de código do nome.
+- **Cálculos:** fórmulas compartilhadas evitam duplicação. Overall, mercado, patrimônio e classificação não são colunas; valores e nomes históricos são gravados quando a operação ocorre.
+- **Atomicidade:** edição, condição, exclusão, compra, venda, escalação e partida usam transações serializáveis. Compra, venda, escalação e partida convertem conflito concorrente em `409`, sem repetição automática; falhas inesperadas desfazem a operação.
+- **Listagens:** filtros persistidos ficam no PostgreSQL; busca Unicode, mercado e ordenação de jogadores são aplicados pela API antes de paginar. Isso reutiliza a fórmula central, mas consome memória proporcional aos candidatos; grandes volumes exigiriam consultas especializadas.
+- **Contratos e históricos:** o contrato continua `ATIVO` após a fidelidade até a venda, que o encerra sem multa. Exclusão de jogador é lógica. Transações e duelos não são recalculados com o cadastro atual; a classificação é derivada dos placares gravados.
+- **Texto e datas:** normalização somente de espaços U+0020, ordenação por pontos de código Unicode e UTC−3 fixo, sem horário de verão histórico.
+- **Erros:** tratamento central retorna JSON com `message`: `400` para entrada inválida, `404` para recurso inexistente, `409` para regra de negócio e `500` genérico para falha inesperada, sem stack trace. Consultas, exclusão e venda ignoram corpo, conforme V1.
+- **CSV:** JSON e exportação compartilham filtros e ordem. CSV usa UTF-8 sem BOM, `;`, vírgula decimal e LF final; erros da exportação continuam em JSON.
+
+## 🧪 Testes e qualidade
+
+Dentro de **`backend/`**, após a instalação e geração do cliente:
+
+```bash
+npm test
+npm run lint
+npm run format:check
+npm run build
+npm audit
+```
+
+Os testes unitários terminam sozinhos, incluem valor de mercado RN02–RN05 e ficam separados do build de produção. `format:check` somente verifica; `npm run format` altera intencionalmente a formatação. `npm audit` consulta os alertas conhecidos, incluindo desenvolvimento; não é garantia de ausência de vulnerabilidades.
+
+### Integração com PostgreSQL — opcional para executar a aplicação
+
+A suíte HTTP apaga dados **somente do banco de testes indicado**. Com o serviço `db` em execução e as credenciais padrão, crie esse banco uma única vez, na **raiz**:
 
 ```bash
 docker compose exec -T db createdb -U liga_user liga_futebol_test
 ```
 
-Na pasta `backend/`, no Ubuntu, usando a porta padrão do Compose:
+Depois, dentro de **`backend/`**, em Bash, usando a porta padrão `5432`:
 
 ```bash
 DATABASE_URL='postgresql://liga_user:liga_password@localhost:5432/liga_futebol_test?schema=public' npm run prisma:deploy
 TEST_DATABASE_URL='postgresql://liga_user:liga_password@localhost:5432/liga_futebol_test?schema=public' npm run test:integration
 ```
 
-Na configuração local com porta `5434`, substitua `5432` nas URLs acima por `5434`. O ambiente de teste utiliza porta HTTP temporária, sem disputar a porta da API Docker.
+Se já criou `liga_futebol_test`, não repita `createdb`. Se alterou porta ou credenciais, ajuste as URLs de teste. A API de integração usa uma porta temporária.
 
-São verificados cadastro, cabeçalho Location, formatos inválidos, filtros, paginação, ordenação, edição, exclusão lógica e atomicidade da alteração de condição dos jogadores. Para clubes, são verificados caixa inicial, normalização, unicidade de nome e sigla, ordenação, consulta e `404`. Para compra, são verificados os contratos, a transação, os limites de caixa e elenco, as recusas e o rollback da operação. Para venda, os testes cobrem multa, lucro, comissão, contrato, liberação do jogador, remoção da escalação, recompra, corpo ignorado e rollback de todos os efeitos.
+Os testes cobrem os módulos, códigos HTTP, `Location`, rollback, limites financeiros, CSV, snapshots e unicidades diretamente no PostgreSQL. Na revisão de 20/10/2026, incluindo a carga demonstrativa, passaram **184 testes unitários e 65 de integração**; os exemplos RN20 e RN21 são referências adicionais, não uma reprodução do roteiro privado da banca.
 
-Histórico e CSV são verificados com o ciclo real de compra e venda: filtros combinados, totais, conciliação com o caixa, nomes e valores do momento, desempate por id, preservação após exclusão lógica, formatos de CSV e erros JSON na exportação.
+Os testes de `test/unit/demo/` validam as entradas fictícias e a proteção das sete tabelas. `test/integration/demo/` verifica a carga completa no PostgreSQL, conciliação do caixa, repetição, preservação de dados existentes, jogador excluído, rollback e execuções concorrentes. A carga não é executada automaticamente pelos testes dos demais módulos.
 
-Os testes de escalação verificam as quatro formações, consulta vazia, ordenação, substituição, validações, preservação da escalação nas recusas e rollback em falha de gravação. Os elencos são formados por compras reais via API. Venda e alteração para DOENTE são testadas com escalação criada pelo endpoint, incluindo a ausência de retorno automático depois da recuperação.
+## 📋 Logs HTTP
 
-Partidas e classificação usam o exemplo da RN20 (Águias FC 1 × 2 Delta FC) como referência, compartilhado em `test/fixtures/league.fixture.ts`. Os testes verificam os seis duelos, redução de condição e arredondamento, empate sem gol, preservação de dados após edição/venda/exclusão, formações históricas, filtros, ordem, efeitos sobre a classificação, ausência de efeitos em caixa/elenco e rollback caso um duelo falhe. Os testes unitários de classificação reproduzem também o exemplo de seis clubes e quatro partidas da RN21.
+Na **raiz**, para ler os logs do container:
 
-### Casos-limite da revisão final
+```bash
+docker compose logs backend
+```
 
-A integração verifica também as restrições diretamente no PostgreSQL: unicidade do nome normalizado e da sigla dos clubes e impedimento de escalar o mesmo jogador em dois clubes. O cadastro aceita nomes válidos com 60 pontos de código mesmo quando a conversão para minúsculas aumenta seu comprimento Unicode, como ocorre com `İ`. A coluna auxiliar `nome_normalizado` usa `TEXT`; o limite de 60 continua sendo validado sobre o nome original normalizado. Uma nova migration amplia somente essa coluna, sem apagar registros nem alterar a migration inicial.
+O Logger do NestJS produz uma linha por requisição concluída, com data/hora em UTC−3, método, caminho e status, inclusive recusas. Corpos e query strings não são registrados. No desenvolvimento local, os logs aparecem no terminal do servidor.
 
-O parser e o formatador de datas usam UTC−3 fixo, conforme RN01, sem aplicar o horário de verão histórico de `America/Sao_Paulo`. Os testes incluem datas de 2018, virada do dia e meia-noite, preservando o instante recebido.
+## 🚧 Funcionalidades não implementadas
 
-## Variáveis
+Nenhuma funcionalidade obrigatória de backend identificada no enunciado ficou pendente de implementação. Limitações da estratégia de listagem e de concorrência estão documentadas acima; as pendências gerais ficam no [README principal](../README.md).
 
-- `DATABASE_URL`: conexão PostgreSQL, usada pelo Prisma.
-- `PORT`: porta HTTP da API; padrão 3000.
-- `FRONTEND_ORIGIN`: única origem permitida pelo CORS; padrão `http://localhost:5173`.
-- `TEST_DATABASE_URL`: conexão exclusiva usada somente pelos testes de integração.
+## 🤖 Uso de inteligência artificial
 
-## Organização e bibliotecas
-
-- NestJS (`common`, `core`, `platform-express`): módulos, injeção de dependências, HTTP, pipes e erros.
-- `@nestjs/config`: carrega as variáveis do `.env`.
-- `@nestjs/swagger`: documentação interativa em `/docs` e especificação em `/docs-json`.
-- Prisma (`@prisma/client` e CLI `prisma`): consultas parametrizadas, transações e migrations.
-- `decimal.js`: precisão decimal e arredondamento explícito dos cálculos.
-- `class-validator` e `class-transformer`: suporte ao mecanismo global de validação do NestJS; os formatos estritos de jogadores são validados pelos pipes próprios.
-- `reflect-metadata` e `rxjs`: infraestrutura do NestJS.
-- Jest, `ts-jest` e `@nestjs/testing`: testes TypeScript e inicialização da API de integração.
-- ESLint, `typescript-eslint`, Prettier e plugins/configurações associados: análise estática e formatação.
-- TypeScript, Nest CLI, schematics, ts-node, ts-loader e source-map-support: compilação e ferramentas de desenvolvimento.
-- Pacotes `@types/*`: declarações de tipos para Node.js, Express e Jest.
-
-### Correções de dependências transitivas
-
-Os `overrides` do npm são restritos aos consumidores afetados: Swagger usa `js-yaml` 5.4.3 e `@prisma/config` usa `deepmerge-ts` 8.0.0. São correções dos alertas [GHSA-r3ph-w7gj-g6xm](https://github.com/advisories/GHSA-r3ph-w7gj-g6xm) e [GHSA-ggr8-5vv4-36mx](https://github.com/advisories/GHSA-ggr8-5vv4-36mx), sem migrar NestJS ou Prisma de versão principal. O [deepmerge-ts 8](https://github.com/RebeccaStevens/deepmerge-ts/releases/tag/v8.0.0) altera o tratamento de Maps e algumas APIs; o Prisma instalado usa a função `deepmerge` para configuração, e este projeto não usa Maps nem configuração Prisma customizada. Geração do cliente, migrations, reset, testes e imagem Docker devem ser revalidados ao alterar essas versões. O lockfile fixa a árvore instalada.
-
-Na árvore de testes, o override de `@istanbuljs/load-nyc-config` usa `js-yaml` 4.3.2 em vez da linha 3, retirando a cadeia antiga `argparse` 1 → `sprintf-js` afetada pelo alerta GHSA-hp3w-g68c-fv3c. O consumidor usa a API `load`, preservada na versão escolhida. `test/unit/tooling/nyc-config.compatibility.spec.ts` carrega a configuração de `test/fixtures/nyc-compatibility.yml` pelo pacote real do Istanbul para verificar essa compatibilidade. O override não altera o YAML usado pelo Swagger.
-
-Verificação: `npm audit --omit=dev` para a árvore de produção; `npm audit` inclui as ferramentas de desenvolvimento. Em 14/10/2026, a migração para Jest 30 e o ajuste restrito do carregador de cobertura eliminaram os 34 apontamentos anteriores: ambas as auditorias retornaram zero na resolução limpa das dependências. O resultado representa os alertas conhecidos nessa data, não uma garantia de ausência de vulnerabilidades futuras. Não foi utilizado `audit fix --force`.
-
-## Arquitetura em camadas por módulo
-
-O backend usa arquitetura em camadas e o padrão Repository. O barema B2 exige separação entre controllers e regras/persistência, mas não exige um pattern específico. Essa estrutura também separa acesso ao banco dos serviços, para facilitar manutenção e testes.
-
-### Convenção de nomes
-
-Classes, tipos, funções, variáveis, arquivos e pastas usam inglês. Tipos/classes seguem PascalCase; funções/variáveis, camelCase; arquivos, kebab-case. Por exemplo: `PlayersService`, `calculateMarketValue`, `homeClubId` e `player.dto.ts`. Valores obrigatórios como `APTO`, `COMPRA` e `MANDANTE` permanecem em português, conforme o contrato da API. Mensagens, descrições dos testes, documentação e commits também permanecem em português.
-
-O Prisma usa modelos e propriedades em inglês, como `Player.name`, mas `@@map` e `@map` preservam os nomes físicos exigidos, como `jogadores.nome`. Essa padronização não exige migration: a comparação entre os schemas antes e depois da refatoração não apresentou diferenças no SQL. Os oito testes de `test/unit/database/prisma-mapping.spec.ts` verificam as sete tabelas, suas colunas, as unicidades e a chave composta da escalação.
-
-Dentro de `src/players/`, `src/clubs/`, `src/market/` e `src/league/`, cada pasta tem uma responsabilidade:
-
-- `controllers/`: rotas, status HTTP e cabeçalhos. Recebe entradas validadas e chama o service.
-- `dto/`: tipos dos dados de cadastro, edição e consulta. Define contratos; os pipes validam esses contratos em execução.
-- `pipes/`: validação estrita de corpo e query params, normalização e seleção de campos permitidos.
-- `services/`: coordena os casos de uso. Busca jogador, chama regras, executa gravações pelo repository e monta a resposta. Não contém consultas Prisma nem fórmulas de cálculo.
-- `repositories/`: concentra as consultas Prisma, o mapeamento de campos para gravação e o isolamento das transações. Não decide se uma edição, condição ou exclusão é permitida.
-- `domain/`: regras de edição, transição de condição, exclusão e listagem. Funções sem dependência de NestJS ou Prisma.
-- `presenters/`: transforma os registros em respostas com os nomes e valores numéricos exigidos pela API, usando os cálculos compartilhados.
-- `swagger/`: documentação dos parâmetros da API.
-- `players.module.ts`: registra controller, service e repository para injeção de dependências.
-
-Em `src/market/`, `PurchaseInputPipe` valida `club_id` e o formato de `loyalty_until`; `purchase.rules.ts` aplica o prazo, a taxa e os limites de caixa e elenco. `sale.rules.ts` calcula multa, lucro, comissão progressiva, crédito e situação final do contrato. `MarketService` coordena compra e venda, enquanto `MarketRepository` concentra as consultas e faz caixa, vínculo do jogador, contrato, transação e saída da escalação participarem da mesma transação serializável. Os presenters montam as respostas `200` usando um mapeamento compartilhado de transação. `loyalty.rules.ts` calcula dias restantes e percentual de multa para a consulta do clube e para a venda.
-
-A venda ignora o corpo, inclusive JSON malformado, conforme V1. Um jogador no elenco sem contrato ativo indica inconsistência dos dados: a venda retorna 500 sem gravar efeitos. Contratos ativos permanecem com esse status até a venda, mesmo após o prazo de fidelidade; nesse caso a venda os encerra sem multa.
-
-O histórico tem `HistoryController`, `HistoryService` e `HistoryRepository` próprios dentro do módulo de mercado. JSON e CSV compartilham validação, consulta e apresentação das transações. O repository filtra e ordena no PostgreSQL, sem consultar os dados atuais do jogador para montar os registros históricos. `history-summary.ts` soma os valores com Decimal, e `history-csv.presenter.ts` cuida do formato e do escape. Jogadores excluídos permanecem no histórico sem filtro; usá-los em `player_id` retorna 404. Sem registros, o JSON tem lista vazia e totais zerados, e o CSV contém somente cabeçalho e LF. O Content-Type CSV é definido após o sucesso da consulta, mantendo erros em JSON.
-
-Em `src/league/`, `LineupInputPipe` valida formação e ids; `lineup.rules.ts` confere clube, condição e distribuição dos setores definidos em `formations.ts`. `LineupsService` coordena a substituição, e `LineupsRepository` grava formação e cinco titulares numa transação serializável. O presenter reutiliza a apresentação de jogadores e a ordenação compartilhada em `common/orderings/squad.ordering.ts`, também usada pela consulta de clube. Conflitos concorrentes retornam 409, sem repetição automática.
-
-Ainda em `src/league/`, `match.rules.ts` seleciona os confrontos, aplica o efeito da condição e calcula gols; `standings.rules.ts` acumula placares e aplica desempates. Os controllers e pipes validam os dados e delegam aos serviços. `MatchesRepository` lê os titulares e grava partida e seis duelos na mesma transação serializável, preservando os dados usados. A consulta apresenta os registros gravados e deriva `result` do placar. `StandingsService` lê clubes e placares numa transação consistente e calcula a tabela sem gravar pontos ou posições. No empate de nomes normalizados, o id crescente garante uma ordem estável, conforme as premissas.
-
-`src/common/` mantém tipos, cálculos e parsers reutilizados. `src/database/` gerencia a conexão Prisma. O endpoint de saúde delega a consulta técnica ao `HealthService`.
-
-### Transações e erros
-
-O service delimita a operação chamando `repository.withTransaction(...)`. O repository entrega ao callback uma instância vinculada ao cliente transacional. Assim, ler o jogador, remover da escalação e gravar a condição usam a mesma transação serializável. Uma falha desfaz tudo; o teste de integração simula essa situação no PostgreSQL.
-
-As regras de domínio lançam `BusinessRuleError`, sem depender de HTTP. O filtro central converte essa falha em `409` com `message`. Prazo de fidelidade fora da faixa lança `InvalidInputError`, convertido em `400`. Formatos inválidos são recusados pelos pipes com `400`, e o service responde `404` quando não encontra o recurso ativo.
-
-Essa é uma arquitetura em camadas pragmática, não uma implementação completa de Clean Architecture: o repository retorna registros tipados pelo Prisma e o presenter conhece esse formato. A dependência do ORM está explícita nessa fronteira, enquanto as regras de domínio permanecem independentes.
-
-### Organização dos testes
-
-Todos os testes ficam em `test/`: unitários em `unit/`, espelhando a área testada, e integração HTTP em `integration/`, separados por módulo. O build de produção exclui toda a pasta `test/`.
-
-## Decisões, pendências e uso de IA
-
-Consulte as seções correspondentes do [README da raiz](../README.md), mantidas como registro central do desenvolvimento. Nenhum commit é criado antes da aprovação do responsável pelo projeto.
+Consulte a declaração central no [README principal](../README.md).
